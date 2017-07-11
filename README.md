@@ -27,15 +27,15 @@ und verknüpfst die Objekte miteinander. Beispiel: erzeuge zwei User mit jeweils
 
 ### User
 
-Fields: `email: str, first_name: str, last_name: str, posts: list of Posts`
+Fields: `email: str, first_name: str, last_name: str, posts: list of Posts`  
 Methods: `full_name(): str, posts(): list of Posts`
 
 ### Post
 
-Fields: `title: str, body: str, publish_date: datetime, created_at: datetime, author: User`
+Fields: `title: str, body: str, publish_date: datetime, created_at: datetime, author: User`  
 Methods: `is_published(): boolean`
 
 ### Comment
 
-Fields: `author_email: str, body: str, created_at: datetime, post: Post`
+Fields: `author_email: str, body: str, created_at: datetime, post: Post`  
 Methods: ...
