@@ -5,6 +5,8 @@ Wir programmieren einen eigenen Blog. Damit decken wir viele wichtigen Web-Theme
 OOP ist die Basis, auf der viele Frameworks basieren. Insbesondere dann, wenn Daten hierarchisch in einer Datenbank gespeichert werden sollen, kann eine Aufteilkung des Codes in
 Klassen und Objekte Sinn machen.
 
+[Dieses Tutorial](https://jeffknupp.com/blog/2014/06/18/improve-your-python-python-classes-and-object-oriented-programming/) sieht sinnvoll aus.
+
 ## Vorbereitung
 
 Lies dich über Objektorientierung schlau. Du solltest folgende Fragen beantworten können:
