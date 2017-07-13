@@ -7,9 +7,21 @@ app = Bottle()
 @app.route('/index')
 @app.route('/index/<name>')
 def greet(name='Stranger'):
-	#return template('Hello {{t_name}}, how are you?', t_name=name)
-	info = {'t_name' : name, 'title' : 'Welcome'}
-	return template('welcome_template.tpl', info)
+	info = {
+		't_name' : name, 
+		'title' : 'Welcome',
+		'posts' : [
+			{
+				'author' : 'John',
+				'body' : 'Beautiful day in Portland!'
+			},
+			{
+				'author' : 'Susan',
+				'body' : 'The Avengers movie was so cool!' 
+			}
+		]
+	}
+	return template('index.tpl', info)
 
 
 if __name__ == '__main__':
