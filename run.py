@@ -11,5 +11,7 @@ def greet(name='Stranger'):
 	info = {'t_name' : name, 'title' : 'Welcome'}
 	return template('welcome_template.tpl', info)
 
-debug(True)
-run(app, host='localhost', port=8080, reloader=True)
+
+if __name__ == '__main__':
+	debug(True)
+	run(app, host='localhost', port=8080, reloader=True)
