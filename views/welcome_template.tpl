@@ -1,5 +1,6 @@
 <html>
 	<head>
+		<title>{{title}}</title>
 	</head>
 	<body>
 		% if t_name == 'Stranger':
