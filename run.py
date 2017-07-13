@@ -18,6 +18,10 @@ def greet(name='Stranger'):
 			{
 				'author' : 'Susan',
 				'body' : 'The Avengers movie was so cool!' 
+			},
+			{
+				'author' : 'Tobias',
+				'body' : 'My new Trainee is the best!'
 			}
 		]
 	}

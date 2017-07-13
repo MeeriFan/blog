@@ -10,10 +10,11 @@
     		<p>How are you, today?</p>
 		% end
 		<div>
-			% for post in info.posts:
-			<p>{{post.author}} says: 
+			% for post in posts:
+			<p>{{post['author']}} says: 
 			<b></b>
-			{{post.body}}</p>			
+			{{post['body']}}</p>	
+			% end		
 		</div>
 	</body>
 </html>
