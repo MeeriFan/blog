@@ -1,14 +1,14 @@
 <html>
 	<head>
-		<title>{{title}}</title>
 	</head>
 	<body>
+		<h1>{{title}}</h1>
 		% if t_name == 'Stranger':
-    		<h1>Hello {{t_name}}!</h1>
+    		<h2>Hello {{t_name}}!</h2>
     		<p>This is a test.</p>
 		% else:
-    		<h1>Hello {{t_name.title()}}!</h1>
-    		<p>How are you?</p>
+    		<h2>Hello {{t_name.title()}}!</h2>
+    		<p>How are you, today?</p>
 		% end
 	</body>
 </html>
