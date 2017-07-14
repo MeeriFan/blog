@@ -65,17 +65,13 @@ def do_login():
 	email = request.forms.get('email')
 	pw = request.forms.get('pw')
 	if email == admin['admin_mail'] and pw == admin['password']:
-		key = str(uuid4())
+		key = uuid4().hex
 		response.set_cookie('session_id', key)
 		session_dict[key] = 'Admin'
 		message = 'Welcome back!'
 		return template('registration.tpl', message=message)
 	else:
 		return redirect('/login/failed')
-
-
-	# hint: perform validation if login is correct
-	# hint: response.set_cookie
 
 if __name__ == '__main__':
 	debug(True)
