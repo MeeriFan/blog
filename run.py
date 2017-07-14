@@ -1,8 +1,19 @@
-
+import peewee
 from bottle import template, Bottle, debug, run, request,response, redirect
 from uuid import uuid4
+from blog_classes import User
 
 app = Bottle()
+
+def get_user_by_mail(u_email, u_pw):
+	try:
+		user = User.get(User.email == u_email, User.password == u_pw)
+	except:
+		user = None
+	return user
+
+def get_user(user_id):
+	return User.get(User.id == user_id)
 
 @app.route('/')
 @app.route('/index')
@@ -39,7 +50,8 @@ def profile():
 	if not session_key in session_dict:
 		return 'You must be logged in!'
 	else:
-		return 'Welcome back, ' + session_dict[session_key] + '!'
+		user = get_user(session_dict[session_key])
+		return 'Welcome back, ' + user.first_name + ' ' + user.last_name + '!'
 
 @app.route('/login')
 def login_form():
@@ -60,17 +72,14 @@ def login_form_failed():
 @app.post('/login')
 @app.post('/login/failed')
 def do_login():
-	admin = {
-		'admin_mail' : 'admin@google.net',
-		'password' : 'adminpassword'
-	}
 	email = request.forms.get('email')
 	pw = request.forms.get('pw')
-	if email == admin['admin_mail'] and pw == admin['password']:
+	user = get_user_by_mail(email, pw)
+	if user:
 		key = uuid4().hex
-		response.set_cookie('session_id', key, secret=SECRET ,max_age=20)
-		session_dict[key] = 'Admin'
-		message = 'Welcome back!'
+		response.set_cookie('session_id', key, secret=SECRET ,max_age=40)
+		session_dict[key] = user.id
+		message = 'Welcome back, ' + user.username + '!'
 		return template('registration.tpl', message=message)
 	else:
 		return redirect('/login/failed')
