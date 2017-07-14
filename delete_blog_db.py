@@ -1,10 +1,10 @@
 import peewee
-from blog_db import Users
-from blog_db import db 
+from blog_classes import User
+from blog_classes import db 
 
 def delete_tables():
 	db.drop_tables(
-		[Users],
+		[User],
 		safe=True)
 
 if __name__ == '__main__':
