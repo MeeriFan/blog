@@ -1,5 +1,6 @@
 
 from bottle import template, Bottle, debug, run, request,response, redirect
+from uuid import uuid4
 
 app = Bottle()
 
@@ -27,14 +28,16 @@ def greet(name='Stranger'):
 	}
 	return template('index.tpl', info)
 
+session_dict = {}
+
 @app.route('/profile')
 def profile():
 	# das hier geht nur, wenn man eingeloggt ist!
-	user_loged_in = request.get_cookie('user_authorised', False)
-	if not user_loged_in:
+	session_key = request.get_cookie('session_id', False)
+	if not session_key in session_dict:
 		return 'You must be logged in!'
 	else:
-		return 'Welcome back'
+		return 'Welcome back, ' + session_dict[session_key] + '!'
 
 @app.route('/login')
 def login_form():
@@ -62,7 +65,9 @@ def do_login():
 	email = request.forms.get('email')
 	pw = request.forms.get('pw')
 	if email == admin['admin_mail'] and pw == admin['password']:
-		response.set_cookie('user_authorised', 'True')
+		key = str(uuid4())
+		response.set_cookie('session_id', key)
+		session_dict[key] = 'Admin'
 		message = 'Welcome back!'
 		return template('registration.tpl', message=message)
 	else:
