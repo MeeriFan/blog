@@ -56,29 +56,20 @@ def login_form_failed():
 @app.post('/login')
 @app.post('/login/failed')
 def do_login():
-	email = request.forms.get('email')
-	pw = request.forms.get('pw')
-	if email and pw:
-		response.set_cookie('user_email', email)
-		response.set_cookie('user_pw', pw)
-
-	return redirect('/login/admin')
-
-@app.route('/login/admin')
-def check_login():
 	admin = {
 		'admin_mail' : 'admin@google.net',
 		'password' : 'adminpassword'
 	}
-
-	user = request.get_cookie('user_email', False)
-	user_pw = request.get_cookie('user_pw', False)
-
-	if user == admin['admin_mail'] and user_pw == admin['password']:
+	email = request.forms.get('email')
+	pw = request.forms.get('pw')
+	if email == admin['admin_mail'] and pw == admin['password']:
+		response.set_cookie('user_authorised', 'True')
 		message = 'Welcome back!'
 		return template('registration.tpl', message=message)
 	else:
 		return redirect('/login/failed')
+
+	return redirect('/login/admin')
 
 	# hint: perform validation if login is correct
 	# hint: response.set_cookie
