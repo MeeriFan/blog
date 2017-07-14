@@ -45,7 +45,16 @@ def login_form():
 	}
 	return template('login.tpl', info)
 
+@app.route('/login/failed')
+def login_form_failed():
+	info = {
+		'title' : 'Login',
+		'message' : 'Login failed. Please try again.'
+	}
+	return template('login.tpl', info)
+
 @app.post('/login')
+@app.post('/login/failed')
 def do_login():
 	email = request.forms.get('email')
 	pw = request.forms.get('pw')
@@ -69,7 +78,7 @@ def check_login():
 		message = 'Welcome back!'
 		return template('registration.tpl', message=message)
 	else:
-		return redirect('/login')
+		return redirect('/login/failed')
 
 	# hint: perform validation if login is correct
 	# hint: response.set_cookie
