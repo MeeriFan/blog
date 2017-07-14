@@ -8,7 +8,7 @@
 		<p>{{message}}</p>
 		<ul>
 			<li>Email: <input type="email" name="email"></li>
-			<li>Password: <input type="text" name="pw"></li>
+			<li>Password: <input type="password" name="pw"></li>
 		</ul>
 		<input type="submit" name="Submit form">
 	</fieldset>
