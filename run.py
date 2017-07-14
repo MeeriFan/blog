@@ -27,15 +27,14 @@ def greet(name='Stranger'):
 	}
 	return template('index.tpl', info)
 
-
 @app.route('/profile')
 def profile():
 	# das hier geht nur, wenn man eingeloggt ist!
-	username = request.get_cookie('logged_in_as', False)
-	if not username:
+	user_loged_in = request.get_cookie('user_authorised', False)
+	if not user_loged_in:
 		return 'You must be logged in!'
 	else:
-		return 'Welcome back, ' + username
+		return 'Welcome back'
 
 @app.route('/login')
 def login_form():
@@ -69,7 +68,6 @@ def do_login():
 	else:
 		return redirect('/login/failed')
 
-	return redirect('/login/admin')
 
 	# hint: perform validation if login is correct
 	# hint: response.set_cookie
