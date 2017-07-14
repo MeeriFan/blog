@@ -30,7 +30,7 @@ def greet(name='Stranger'):
 
 session_dict = {}
 
-SECRET = 'hundkatzemaus'
+SECRET = 'dogcatmouse'
 
 @app.route('/profile')
 def profile():
