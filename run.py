@@ -1,5 +1,5 @@
 
-from bottle import template, Bottle, debug, run, request,response
+from bottle import template, Bottle, debug, run, request,response, redirect
 
 app = Bottle()
 
@@ -47,16 +47,20 @@ def login_form():
 
 @app.post('/login')
 def do_login():
-	admin = {
-		'admin_mail' : 'admin@google.net',
-		'password' : 'adminpassword'
-	}
-
 	email = request.forms.get('email')
 	pw = request.forms.get('pw')
 	if email and pw:
 		response.set_cookie('user_email', email)
 		response.set_cookie('user_pw', pw)
+
+	return redirect('/login/admin')
+
+@app.route('/login/admin')
+def check_login():
+	admin = {
+		'admin_mail' : 'admin@google.net',
+		'password' : 'adminpassword'
+	}
 
 	user = request.get_cookie('user_email', False)
 	user_pw = request.get_cookie('user_pw', False)
@@ -65,11 +69,7 @@ def do_login():
 		message = 'Welcome back!'
 		return template('registration.tpl', message=message)
 	else:
-		info = {
-			'title' : 'Login',
-			'message' : 'Login failed. Please try again.'
-		}
-		return template('login.tpl', info)
+		return redirect('/login')
 
 	# hint: perform validation if login is correct
 	# hint: response.set_cookie
