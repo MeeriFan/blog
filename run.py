@@ -1,5 +1,6 @@
 
-from bottle import template, Bottle, debug, run
+from bottle import template, Bottle, debug, run, request,response, redirect
+from uuid import uuid4
 
 app = Bottle()
 
@@ -27,6 +28,50 @@ def greet(name='Stranger'):
 	}
 	return template('index.tpl', info)
 
+session_dict = {}
+
+@app.route('/profile')
+def profile():
+	# das hier geht nur, wenn man eingeloggt ist!
+	session_key = request.get_cookie('session_id', False)
+	if not session_key in session_dict:
+		return 'You must be logged in!'
+	else:
+		return 'Welcome back, ' + session_dict[session_key] + '!'
+
+@app.route('/login')
+def login_form():
+	info = {
+		'title' : 'Login',
+		'message' : 'Please log in.'
+	}
+	return template('login.tpl', info)
+
+@app.route('/login/failed')
+def login_form_failed():
+	info = {
+		'title' : 'Login',
+		'message' : 'Login failed. Please try again.'
+	}
+	return template('login.tpl', info)
+
+@app.post('/login')
+@app.post('/login/failed')
+def do_login():
+	admin = {
+		'admin_mail' : 'admin@google.net',
+		'password' : 'adminpassword'
+	}
+	email = request.forms.get('email')
+	pw = request.forms.get('pw')
+	if email == admin['admin_mail'] and pw == admin['password']:
+		key = uuid4().hex
+		response.set_cookie('session_id', key)
+		session_dict[key] = 'Admin'
+		message = 'Welcome back!'
+		return template('registration.tpl', message=message)
+	else:
+		return redirect('/login/failed')
 
 if __name__ == '__main__':
 	debug(True)
