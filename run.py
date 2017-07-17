@@ -33,10 +33,27 @@ def register_validation(user_register):
 		return False, message
 	return True, ''
 
+def setting_cookie(user_id):
+	key = uuid4().hex
+	response.set_cookie('session_id', key, secret=SECRET)
+	session_dict[key] = user_id
+
+def deleting_cookie(delete_user=False):
+	session_key = get_key()
+	del session_dict[session_key]
+	response.delete_cookie('session_id', secret=SECRET)
+	if delete_user:
+		user_id = session_dict[session_key]
+		old_user = get_user(user_id)
+		old_user.delete_instance()
+
+def get_key():	
+	return request.get_cookie('session_id', secret=SECRET)
+
 @app.route('/')
 @app.route('/index')
 def index():
-	session_key = request.get_cookie('session_id', secret=SECRET)
+	session_key = get_key()
 	if session_key in session_dict:
 		return template('index.tpl', logged_in='yes')
 	else:
@@ -49,7 +66,7 @@ SECRET = 'dogcatmouse'
 @app.route('/profile')
 def profile():
 	# das hier geht nur, wenn man eingeloggt ist!
-	session_key = request.get_cookie('session_id', secret=SECRET)
+	session_key = get_key()
 	if not session_key in session_dict:
 		info = {
 			'message' : 'You must be logged in.',
@@ -91,9 +108,7 @@ def do_login():
 	pw = request.forms.get('pw')
 	user = get_user_by_mail(email, pw)
 	if user:
-		key = uuid4().hex
-		response.set_cookie('session_id', key, secret=SECRET)
-		session_dict[key] = user.id
+		setting_cookie(user.id)
 		message = 'Welcome back, ' + user.username + '!'
 		info = {
 			'message' : message,
@@ -105,9 +120,7 @@ def do_login():
 
 @app.post('/logout')
 def do_logout():
-	session_key = request.get_cookie('session_id', secret=SECRET)
-	del session_dict[session_key]
-	response.delete_cookie('session_id', secret=SECRET)
+	deleting_cookie()
 	return redirect('/index')
 
 @app.route('/registration')
@@ -148,9 +161,7 @@ def do_registration():
 			password=user_info['u_pw']
 		)
 		new_user.save()
-		key = uuid4().hex
-		response.set_cookie('session_id', key, secret=SECRET)
-		session_dict[key] = new_user.id
+		setting_cookie(new_user.id)
 		info = {
 			'f_name' : user_info['u_f_name'],
 			'l_name' : user_info['u_l_name'],
@@ -176,12 +187,7 @@ def delete_user():
 
 @app.post('/delete')
 def do_delete():
-	session_key = request.get_cookie('session_id', secret=SECRET)
-	user_id = session_dict[session_key]
-	old_user = get_user(user_id)
-	old_user.delete_instance()
-	del session_dict[session_key]
-	response.delete_cookie('session_id', secret=SECRET)
+	deleting_cookie(delete_user=True)
 	return template('sorry.tpl', logged_in='no')
 
 @app.route('/static/<path:path>')
