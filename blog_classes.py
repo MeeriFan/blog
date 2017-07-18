@@ -1,5 +1,7 @@
-from datetime import datetime
-from datetime import date
+#from datetime import datetime
+#from datetime import date
+import hashlib
+from uuid import uuid4
 from peewee import SqliteDatabase, Model
 from peewee import CharField
 
@@ -21,8 +23,8 @@ class User(BaseModel):
 		db_table = 'users'
 
 	def is_valid(self, repeated_pw):
-		for attribute in self:
-			if attribute == '':
+		for attribute, value in self.__dict__.items():
+			if value == '':
 				message = 'You have to fill out all fields.'
 				return False, message
 		if not len(self.password) >= 8:
@@ -38,4 +40,14 @@ class User(BaseModel):
 			message = 'Your email address is not valid.'
 			return False, message
 		return True, None
+
+	def is_already_in_db(self):
+		return User.select().where(User.email == self.email).exists()
+
+	def generate_salt(self):
+		self.salt = uuid4().hex
+		self.save()
+
+	def hash_password(self):
+		return hashlib.sha256(self.salt.encode()+self.password.encode()).hexdigest()
 

@@ -155,6 +155,38 @@ def registration(message='Please fill out the form completely for registration.'
 
 @app.post('/registration')
 def do_registration():
+	new_user = User(
+		username=request.forms.get('nickname'),
+		email=request.forms.get('email'),
+		first_name=request.forms.get('first_name'),
+		last_name=request.forms.get('last_name'),
+		password=request.forms.get('pw')
+	)
+	if not new_user.is_already_in_db():
+		valid, error = new_user.is_valid(request.forms.get('r_pw'))
+		if valid:
+			new_user.generate_salt()
+			new_user.password = new_user.hash_password()
+			new_user.save()
+			setting_cookie(new_user.id)
+			info = {
+				'f_name' : new_user.first_name,
+				'l_name' : new_user.last_name,
+				'logged_in' : 'yes'
+			}
+			return template('thank_you.tpl', info)
+		else:
+			return registration(message=error) 
+	else:
+		info = {
+			'message' : 'You are already registered.',
+			'href' : 'registration',
+			'logged_in' : 'no'
+		}
+		return template('error.tpl', info)
+
+
+"""
 	user_info =	{
 		'u_f_name' : request.forms.get('first_name'),
 		'u_l_name' : request.forms.get('last_name'),
@@ -193,6 +225,7 @@ def do_registration():
 			'logged_in' : 'no'
 		}
 		return template('error.tpl', info)
+"""
 
 @app.route('/delete')
 def delete_user():
