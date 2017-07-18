@@ -6,9 +6,16 @@ from blog_classes import User
 
 app = Bottle()
 
-def get_user_by_mail(u_email, u_pw):
-	u_pw = do_hash(u_pw)
+def get_user_by_mail(u_email):
 	try:
+		return User.get(User.email == u_email)
+	except:
+		return None
+
+def verify_login(u_email, u_pw):
+	try:
+		u = User.get(User.email == u_email)
+		u_pw = do_hash(u_pw, u.salt)
 		return User.get(User.email == u_email, User.password == u_pw)
 	except:
 		return None
@@ -52,8 +59,11 @@ def deleting_cookie(delete_user=False):
 def get_key():	
 	return request.get_cookie('session_id', secret=SECRET)
 
-def do_hash(password):
-	return hashlib.sha256(password.encode()).hexdigest()
+def get_salt():
+	return uuid4().hex
+
+def do_hash(password, salt):
+	return hashlib.sha256(salt.encode() + password.encode()).hexdigest()
 
 @app.route('/')
 @app.route('/index')
@@ -111,7 +121,7 @@ def login_form_failed():
 def do_login():
 	email = request.forms.get('email')
 	pw = request.forms.get('pw')
-	user = get_user_by_mail(email, pw)
+	user = verify_login(email, pw)
 	if user:
 		setting_cookie(user.id)
 		message = 'Welcome back, ' + user.username + '!'
@@ -156,14 +166,17 @@ def do_registration():
 	input_validated, message = register_validation(user_info)
 	if not input_validated:
 		return registration(message=message, user_info=user_info)
-	user_known = get_user_by_mail(user_info['u_email'], user_info['u_pw'])
+	user_known = get_user_by_mail(user_info['u_email'])
 	if not user_known:
+		u_salt = get_salt()
+		hashed_pw = do_hash(user_info['u_pw'], u_salt)
 		new_user = User(
 			username=user_info['u_name'], 
 			email=user_info['u_email'], 
 			first_name=user_info['u_f_name'],
 			last_name=user_info['u_l_name'],
-			password=do_hash(user_info['u_pw'])
+			password=hashed_pw,
+			salt=u_salt
 		)
 		new_user.save()
 		setting_cookie(new_user.id)

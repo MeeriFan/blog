@@ -15,6 +15,7 @@ class User(BaseModel):
 	first_name = CharField()
 	last_name = CharField()
 	password = CharField()
+	salt = CharField()
 
 	class Meta:
 		db_table = 'users'
