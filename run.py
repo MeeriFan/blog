@@ -1,4 +1,5 @@
 import peewee
+import hashlib
 from bottle import template, Bottle, debug, run, request,response, redirect, static_file
 from uuid import uuid4
 from blog_classes import User
@@ -6,6 +7,7 @@ from blog_classes import User
 app = Bottle()
 
 def get_user_by_mail(u_email, u_pw):
+	u_pw = do_hash(u_pw)
 	try:
 		return User.get(User.email == u_email, User.password == u_pw)
 	except:
@@ -49,6 +51,9 @@ def deleting_cookie(delete_user=False):
 
 def get_key():	
 	return request.get_cookie('session_id', secret=SECRET)
+
+def do_hash(password):
+	return hashlib.sha256(password.encode()).hexdigest()
 
 @app.route('/')
 @app.route('/index')
@@ -158,7 +163,7 @@ def do_registration():
 			email=user_info['u_email'], 
 			first_name=user_info['u_f_name'],
 			last_name=user_info['u_l_name'],
-			password=user_info['u_pw']
+			password=do_hash(user_info['u_pw'])
 		)
 		new_user.save()
 		setting_cookie(new_user.id)
