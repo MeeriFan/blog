@@ -4,15 +4,15 @@ from blog_classes import User
 
 app = Bottle()
 
-def setting_cookie(user_id):
+def set_app_cookie(user_id):
 	key = uuid4().hex
 	response.set_cookie('session_id', key, secret=SECRET)
 	session_dict[key] = user_id
 
-def deleting_cookie(delete_user=False):
+def delete_app_cookie(deactivate_user=False):
 	session_key = get_key()
-	if delete_user:
-		User.delete_user(session_dict[session_key])
+	if deactivate_user:
+		User.deactivate_user(session_dict[session_key])
 	del session_dict[session_key]
 	response.delete_cookie('session_id', secret=SECRET)
 
@@ -78,23 +78,26 @@ def do_login():
 	)
 	if user.verify_login():
 		user = user.get_db_user_by_mail()
-		setting_cookie(user.id)
-		message = 'Welcome back, ' + user.username + '!'
-		info = {
-			'message' : message,
-			'logged_in' : 'yes'
-		}
-		return template('profile.tpl', info)
+		if not user.active:
+			return redirect('/login/failed')
+		else:
+			set_app_cookie(user.id)
+			message = 'Welcome back, ' + user.username + '!'
+			info = {
+				'message' : message,
+				'logged_in' : 'yes'
+			}
+			return template('profile.tpl', info)
 	else:
 		return redirect('/login/failed')
 
 @app.post('/logout')
 def do_logout():
-	deleting_cookie()
+	delete_app_cookie()
 	return redirect('/index')
 
 @app.route('/registration')
-def registration(message='Please fill out the form completely for registration.',user=User(), r_pw=''):
+def registration(message='Please fill out the form completely for registration.',user=User(), repeated_pw=''):
 	info = {
 		'title' : 'Registration',
 		'message' : message,
@@ -104,7 +107,7 @@ def registration(message='Please fill out the form completely for registration.'
 		'u_name' : user.username,
 		'u_email' : user.email,
 		'u_pw' : user.password,
-		'u_pw_r' : r_pw
+		'u_pw_r' : repeated_pw
 	}
 	return template('registration.tpl', info)
 
@@ -123,16 +126,28 @@ def do_registration():
 		if valid:
 			new_user.generate_salt()
 			new_user.password = new_user.hash_password()
+			new_user.active = True
 			new_user.save()
-			setting_cookie(new_user.id)
+			set_app_cookie(new_user.id)
 			info = {
 				'f_name' : new_user.first_name,
 				'l_name' : new_user.last_name,
-				'logged_in' : 'yes'
+				'logged_in' : 'yes',
+				'message' : 'Thank you for registrating to this microblog!'
 			}
 			return template('thank_you.tpl', info)
 		else:
 			return registration(message=error, u=new_user, r_pw=repeated_passwpord) 
+	elif new_user.is_inactive():
+		knwon_user = new_user.reactivate_account()
+		set_app_cookie(knwon_user.id)
+		info = {
+			'message' : 'Thanks for reactivating your account.',
+			'f_name' : knwon_user.first_name,
+			'l_name' : knwon_user.last_name,
+			'logged_in' : 'yes'
+		}
+		return template('thank_you.tpl', info)
 	else:
 		info = {
 			'message' : 'You are already registered.',
@@ -141,19 +156,42 @@ def do_registration():
 		}
 		return template('error.tpl', info)
 
-@app.route('/delete')
-def delete_user():
+@app.route('/deactivate')
+def deactivate_user():
 	info = {
 		'title' : 'Good Bye?',
-		'message' : 'You really want to delete you profile?',
+		'message' : 'You really want to deactivate you profile? This means you have to register again to reactivate your profile. All your data will be kept.',
+		'logged_in' : 'yes'
+	}
+	return template('deactivate.tpl', info)
+
+@app.post('/deactivate')
+def do_deactivate():
+	delete_app_cookie(deactivate_user=True)
+	info = {
+		'logged_in' : 'no',
+		'specification' : 'deactivated'
+	}
+	return template('sorry.tpl', info)
+
+@app.route('/delete')
+def delete_account():
+	info = {
+		'title' : 'Good Bye?',
+		'message' : 'You really want to delete your account? This means that your whole profile will be deleted and there is no way back. Are you sure? You should consider to deactivate your profile',
 		'logged_in' : 'yes'
 	}
 	return template('delete.tpl', info)
 
 @app.post('/delete')
 def do_delete():
-	deleting_cookie(delete_user=True)
-	return template('sorry.tpl', logged_in='no')
+	User.delete_user(session_dict[get_key()])
+	delete_app_cookie()
+	info = {
+		'logged_in' : 'no',
+		'specification' : 'deleted'
+	}
+	return template('sorry.tpl', info)
 
 @app.route('/static/<path:path>')
 def static_files(path):
