@@ -1,46 +1,12 @@
 import peewee
-import hashlib
 from bottle import template, Bottle, debug, run, request,response, redirect, static_file
 from uuid import uuid4
 from blog_classes import User
 
 app = Bottle()
 
-def get_user_by_mail(u_email):
-	try:
-		return User.get(User.email == u_email)
-	except:
-		return None
-
-def verify_login(u_email, u_pw):
-	try:
-		u = User.get(User.email == u_email)
-		u_pw = do_hash(u_pw, u.salt)
-		return User.get(User.email == u_email, User.password == u_pw)
-	except:
-		return None
-
 def get_user(user_id):
 	return User.get(User.id == user_id)
-
-def register_validation(user_register):
-	for key in user_register:
-		if user_register[key] == '':
-			message = 'You have to fill out all fields.'
-			return False, message
-	if not len(user_register['u_pw']) >= 8:
-		message = 'The password needs to be at least 8 signs long.'
-		return False, message
-	if not any(c.isalpha() for c in user_register['u_pw']):
-		message = 'Your password should at least contain one alphabetic character.'
-		return False, message
-	if not user_register['u_pw'] == user_register['u_pw_r']:
-		message = 'The password and repeated password have to be the same.'
-		return False, message
-	if not '@' in user_register['u_email'] and not '.' in user_register['u_email']:
-		message = 'Your email address is not valid.'
-		return False, message
-	return True, ''
 
 def setting_cookie(user_id):
 	key = uuid4().hex
@@ -58,12 +24,6 @@ def deleting_cookie(delete_user=False):
 
 def get_key():	
 	return request.get_cookie('session_id', secret=SECRET)
-
-def get_salt():
-	return uuid4().hex
-
-def do_hash(password, salt):
-	return hashlib.sha256(salt.encode() + password.encode()).hexdigest()
 
 @app.route('/')
 @app.route('/index')
@@ -119,10 +79,12 @@ def login_form_failed():
 @app.post('/login')
 @app.post('/login/failed')
 def do_login():
-	email = request.forms.get('email')
-	pw = request.forms.get('pw')
-	user = verify_login(email, pw)
-	if user:
+	user = User(
+		email=request.forms.get('email'),
+		password=request.forms.get('pw')
+	)
+	if user.login_valid():
+		user = user.get_db_user()
 		setting_cookie(user.id)
 		message = 'Welcome back, ' + user.username + '!'
 		info = {
@@ -139,17 +101,17 @@ def do_logout():
 	return redirect('/index')
 
 @app.route('/registration')
-def registration(message='Please fill out the form completely for registration.',user_info={}):
+def registration(message='Please fill out the form completely for registration.',u=User(), r_pw=''):
 	info = {
 		'title' : 'Registration',
 		'message' : message,
 		'logged_in' : 'no',
-		'u_f_name' : user_info.get('u_f_name', ''),
-		'u_l_name' : user_info.get('u_l_name', ''),
-		'u_name' : user_info.get('u_name', ''),
-		'u_email' : user_info.get('u_email', ''),
-		'u_pw' : user_info.get('u_pw', ''),
-		'u_pw_r' : user_info.get('u_pw_r', '')
+		'u_f_name' : u.first_name,
+		'u_l_name' : u.last_name,
+		'u_name' : u.username,
+		'u_email' : u.email,
+		'u_pw' : u.password,
+		'u_pw_r' : r_pw
 	}
 	return template('registration.tpl', info)
 
@@ -163,7 +125,8 @@ def do_registration():
 		password=request.forms.get('pw')
 	)
 	if not new_user.is_already_in_db():
-		valid, error = new_user.is_valid(request.forms.get('r_pw'))
+		repeated_passwpord = request.forms.get('r_pw')
+		valid, error = new_user.is_valid(repeated_passwpord)
 		if valid:
 			new_user.generate_salt()
 			new_user.password = new_user.hash_password()
@@ -176,7 +139,7 @@ def do_registration():
 			}
 			return template('thank_you.tpl', info)
 		else:
-			return registration(message=error) 
+			return registration(message=error, u=new_user, r_pw=repeated_passwpord) 
 	else:
 		info = {
 			'message' : 'You are already registered.',
@@ -184,48 +147,6 @@ def do_registration():
 			'logged_in' : 'no'
 		}
 		return template('error.tpl', info)
-
-
-"""
-	user_info =	{
-		'u_f_name' : request.forms.get('first_name'),
-		'u_l_name' : request.forms.get('last_name'),
-		'u_name' : request.forms.get('nickname'),
-		'u_email' : request.forms.get('email'),
-		'u_pw' : request.forms.get('pw'),
-		'u_pw_r' : request.forms.get('r_pw')
-	}
-	input_validated, message = register_validation(user_info)
-	if not input_validated:
-		return registration(message=message, user_info=user_info)
-	user_known = get_user_by_mail(user_info['u_email'])
-	if not user_known:
-		u_salt = get_salt()
-		hashed_pw = do_hash(user_info['u_pw'], u_salt)
-		new_user = User(
-			username=user_info['u_name'], 
-			email=user_info['u_email'], 
-			first_name=user_info['u_f_name'],
-			last_name=user_info['u_l_name'],
-			password=hashed_pw,
-			salt=u_salt
-		)
-		new_user.save()
-		setting_cookie(new_user.id)
-		info = {
-			'f_name' : user_info['u_f_name'],
-			'l_name' : user_info['u_l_name'],
-			'logged_in' : 'yes'
-		}
-		return template('thank_you.tpl', info)
-	else:
-		info = {
-			'message' : 'You are already registered.',
-			'href' : 'registration',
-			'logged_in' : 'no'
-		}
-		return template('error.tpl', info)
-"""
 
 @app.route('/delete')
 def delete_user():
