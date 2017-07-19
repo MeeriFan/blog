@@ -1,4 +1,3 @@
-import peewee
 from bottle import template, Bottle, debug, run, request,response, redirect, static_file
 from uuid import uuid4
 from blog_classes import User
