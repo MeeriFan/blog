@@ -47,5 +47,5 @@ Nun, da wir User anlegen können und uns auch als User einloggen können, wird e
 Neue Routen:
 
 `GET /users` -> Zeige eine Liste mit allen Usern und Verlinkung auf die Detailseiten eines Users  
-`GET /users/{id}` -> wobei {id} eine variable Zahl ist. Zeigt die Detailseite eines Users an. Aktuell würde ich einfach Vorname und Nachname anzeigen, später kommen hier noch die Posts der User hin.  
+`GET /users/{user_id}` -> wobei {user_id} eine variable Zahl ist. Zeigt die Detailseite eines Users an. Aktuell würde ich einfach Vorname und Nachname anzeigen, später kommen hier noch die Posts der User hin.  
 
