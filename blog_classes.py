@@ -62,7 +62,9 @@ class User(BaseModel):
 		return hashlib.sha256(self.salt.encode()+self.password.encode()).hexdigest()
 
 	def verify_login(self):
-		db_user = self.get_user_by_mail()
+		db_user = self.get_db_user_by_mail()
+		if not db_user:
+			return False
 		self.salt = db_user.salt
 		self.password = self.hash_password()
 		return User.select().where(
@@ -71,7 +73,10 @@ class User(BaseModel):
 		).exists()
 
 	def get_db_user_by_mail(self):
-		return User.get(User.email == self.email)
+		try:
+			return User.get(User.email == self.email)
+		except:
+			return None
 
 	def get_user(user_id):
 		return User.get(User.id == user_id)
