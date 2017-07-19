@@ -61,7 +61,7 @@ class User(BaseModel):
 	def hash_password(self):
 		return hashlib.sha256(self.salt.encode()+self.password.encode()).hexdigest()
 
-	def login_valid(self):
+	def verify_login(self):
 		db_user = self.get_user_by_mail()
 		self.salt = db_user.salt
 		self.password = self.hash_password()
@@ -70,8 +70,12 @@ class User(BaseModel):
 			User.password == self.password
 		).exists()
 
-	def get_user_by_mail(self):
+	def get_db_user_by_mail(self):
 		return User.get(User.email == self.email)
 
-	def get_user_by_id(self):
-		return User.get(User.id == self.id)
+	def get_user(user_id):
+		return User.get(User.id == user_id)
+
+	def delete_user(user_id):
+		user = User.get_user(user_id)
+		user.delete_instance()
