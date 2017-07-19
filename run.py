@@ -30,10 +30,12 @@ def greet(name='Stranger'):
 
 session_dict = {}
 
+SECRET = 'dogcatmouse'
+
 @app.route('/profile')
 def profile():
 	# das hier geht nur, wenn man eingeloggt ist!
-	session_key = request.get_cookie('session_id', False)
+	session_key = request.get_cookie('session_id', secret=SECRET)
 	if not session_key in session_dict:
 		return 'You must be logged in!'
 	else:
@@ -66,7 +68,7 @@ def do_login():
 	pw = request.forms.get('pw')
 	if email == admin['admin_mail'] and pw == admin['password']:
 		key = uuid4().hex
-		response.set_cookie('session_id', key, max_age=20)
+		response.set_cookie('session_id', key, secret=SECRET ,max_age=20)
 		session_dict[key] = 'Admin'
 		message = 'Welcome back!'
 		return template('registration.tpl', message=message)
