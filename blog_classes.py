@@ -12,21 +12,31 @@ class BaseModel(Model):
 		database = db
 
 class User(BaseModel):
-	username = CharField()
-	email = CharField()
-	first_name = CharField()
-	last_name = CharField()
-	password = CharField()
+	username = CharField(default='')
+	email = CharField(default='')
+	first_name = CharField(default='')
+	last_name = CharField(default='')
+	password = CharField(default='')
 	salt = CharField()
 
 	class Meta:
 		db_table = 'users'
 
 	def is_valid(self, repeated_pw):
+		if self.username == '' or\
+			self.email == '' or\
+			self.first_name == '' or\
+			self.last_name == '' or\
+			self.password == '':
+			message = 'You have to fill out all fields.'
+			return False, message
+		"""
 		for attribute, value in self.__dict__.items():
-			if value == '':
-				message = 'You have to fill out all fields.'
-				return False, message
+			for key, user_input in value.items():
+				if user_input == '':
+					message = 'You have to fill out all fields.'
+					return False, message
+		"""
 		if not len(self.password) >= 8:
 			message = 'Your password needs to be at least 8 characters long.'
 			return False, message
@@ -51,3 +61,17 @@ class User(BaseModel):
 	def hash_password(self):
 		return hashlib.sha256(self.salt.encode()+self.password.encode()).hexdigest()
 
+	def login_valid(self):
+		db_user = self.get_user_by_mail()
+		self.salt = db_user.salt
+		self.password = self.hash_password()
+		return User.select().where(
+			User.email == self.email, 
+			User.password == self.password
+		).exists()
+
+	def get_user_by_mail(self):
+		return User.get(User.email == self.email)
+
+	def get_user_by_id(self):
+		return User.get(User.id == self.id)
