@@ -1,5 +1,5 @@
 import peewee
-from bottle import template, Bottle, debug, run, request,response, redirect
+from bottle import template, Bottle, debug, run, request,response, redirect, static_file
 from uuid import uuid4
 from blog_classes import User
 
@@ -103,10 +103,6 @@ def do_login():
 	else:
 		return redirect('/login/failed')
 
-@app.route('/logout')
-def logout():
-	return template('logout.tpl', logged_in='yes')
-
 @app.post('/logout')
 def do_logout():
 	session_key = request.get_cookie('session_id', secret=SECRET)
@@ -115,17 +111,17 @@ def do_logout():
 	return redirect('/index')
 
 @app.route('/registration')
-def registration(message='Please fill out the form completely for registration.',user_info={'u_f_name':'','u_l_name':'','u_name':'','u_email':'','u_pw':'','u_pw_r':''}):
+def registration(message='Please fill out the form completely for registration.',user_info={}):
 	info = {
 		'title' : 'Registration',
 		'message' : message,
 		'logged_in' : 'no',
-		'u_f_name' : user_info['u_f_name'],
-		'u_l_name' : user_info['u_l_name'],
-		'u_name' : user_info['u_name'],
-		'u_email' : user_info['u_email'],
-		'u_pw' : user_info['u_pw'],
-		'u_pw_r' : user_info['u_pw_r']
+		'u_f_name' : user_info.get('u_f_name', ''),
+		'u_l_name' : user_info.get('u_l_name', ''),
+		'u_name' : user_info.get('u_name', ''),
+		'u_email' : user_info.get('u_email', ''),
+		'u_pw' : user_info.get('u_pw', ''),
+		'u_pw_r' : user_info.get('u_pw_r', '')
 	}
 	return template('registration.tpl', info)
 
@@ -188,6 +184,9 @@ def do_delete():
 	response.delete_cookie('session_id', secret=SECRET)
 	return template('sorry.tpl', logged_in='no')
 
+@app.route('/static/<path:path>')
+def static_files(path):
+    return static_file(path, 'static/')
 
 if __name__ == '__main__':
 	debug(True)
