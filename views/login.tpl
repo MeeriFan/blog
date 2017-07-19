@@ -1,10 +1,7 @@
 % rebase('base.tpl')
-<h1>{{title}}</h1>
+<h2>{{title}}</h2>
 <form method="post" action="/login">
 	<fieldset>
-		<legend>
-			LOGIN
-		</legend>
 		<p>{{message}}</p>
 		<ul>
 			<li>Email: <input type="email" name="email"></li>
@@ -13,3 +10,4 @@
 		<input type="submit" name="Submit form">
 	</fieldset>
 </form>
+<a href="/index">Back to mainpage</a>
