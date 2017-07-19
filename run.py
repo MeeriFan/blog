@@ -5,9 +5,6 @@ from blog_classes import User
 
 app = Bottle()
 
-def get_user(user_id):
-	return User.get(User.id == user_id)
-
 def setting_cookie(user_id):
 	key = uuid4().hex
 	response.set_cookie('session_id', key, secret=SECRET)
@@ -15,12 +12,10 @@ def setting_cookie(user_id):
 
 def deleting_cookie(delete_user=False):
 	session_key = get_key()
+	if delete_user:
+		User.delete_user(session_dict[session_key])
 	del session_dict[session_key]
 	response.delete_cookie('session_id', secret=SECRET)
-	if delete_user:
-		user_id = session_dict[session_key]
-		old_user = get_user(user_id)
-		old_user.delete_instance()
 
 def get_key():	
 	return request.get_cookie('session_id', secret=SECRET)
@@ -40,7 +35,6 @@ SECRET = 'dogcatmouse'
 
 @app.route('/profile')
 def profile():
-	# das hier geht nur, wenn man eingeloggt ist!
 	session_key = get_key()
 	if not session_key in session_dict:
 		info = {
@@ -50,7 +44,7 @@ def profile():
 		}
 		return template('error.tpl', info)
 	else:
-		user = get_user(session_dict[session_key])
+		user = User.get_user(session_dict[session_key])
 		message = 'Welcome back, ' + user.first_name +' '+ user.last_name + '!'
 		info = {
 			'message' : message,
@@ -83,8 +77,8 @@ def do_login():
 		email=request.forms.get('email'),
 		password=request.forms.get('pw')
 	)
-	if user.login_valid():
-		user = user.get_db_user()
+	if user.verify_login():
+		user = user.get_db_user_by_mail()
 		setting_cookie(user.id)
 		message = 'Welcome back, ' + user.username + '!'
 		info = {
@@ -101,16 +95,16 @@ def do_logout():
 	return redirect('/index')
 
 @app.route('/registration')
-def registration(message='Please fill out the form completely for registration.',u=User(), r_pw=''):
+def registration(message='Please fill out the form completely for registration.',user=User(), r_pw=''):
 	info = {
 		'title' : 'Registration',
 		'message' : message,
 		'logged_in' : 'no',
-		'u_f_name' : u.first_name,
-		'u_l_name' : u.last_name,
-		'u_name' : u.username,
-		'u_email' : u.email,
-		'u_pw' : u.password,
+		'u_f_name' : user.first_name,
+		'u_l_name' : user.last_name,
+		'u_name' : user.username,
+		'u_email' : user.email,
+		'u_pw' : user.password,
 		'u_pw_r' : r_pw
 	}
 	return template('registration.tpl', info)
