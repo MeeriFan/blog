@@ -14,6 +14,25 @@ def get_user_by_mail(u_email, u_pw):
 def get_user(user_id):
 	return User.get(User.id == user_id)
 
+def register_validation(user_register):
+	for key in user_register:
+		if user_register[key] == '':
+			message = 'You have to fill out all fields.'
+			return False, message
+	if not len(user_register['u_pw']) >= 8:
+		message = 'The password needs to be at least 8 signs long.'
+		return False, message
+	if not any(c.isalpha() for c in user_register['u_pw']):
+		message = 'Your password should at least contain one alphabetic character.'
+		return False, message
+	if not user_register['u_pw'] == user_register['u_pw_r']:
+		message = 'The password and repeated password have to be the same.'
+		return False, message
+	if not '@' in user_register['u_email'] and not '.' in user_register['u_email']:
+		message = 'Your email address is not valid.'
+		return False, message
+	return True, ''
+
 @app.route('/')
 @app.route('/index')
 def index():
@@ -96,37 +115,49 @@ def do_logout():
 	return redirect('/index')
 
 @app.route('/registration')
-def registration():
+def registration(message='Please fill out the form completely for registration.',user_info={'u_f_name':'','u_l_name':'','u_name':'','u_email':'','u_pw':'','u_pw_r':''}):
 	info = {
 		'title' : 'Registration',
-		'message' : 'Please fill out the form completely for registration.',
-		'logged_in' : 'no'
+		'message' : message,
+		'logged_in' : 'no',
+		'u_f_name' : user_info['u_f_name'],
+		'u_l_name' : user_info['u_l_name'],
+		'u_name' : user_info['u_name'],
+		'u_email' : user_info['u_email'],
+		'u_pw' : user_info['u_pw'],
+		'u_pw_r' : user_info['u_pw_r']
 	}
 	return template('registration.tpl', info)
 
 @app.post('/registration')
 def do_registration():
-	u_f_name = request.forms.get('first_name')
-	u_l_name = request.forms.get('last_name')
-	u_name = request.forms.get('nickname')
-	u_email = request.forms.get('email')
-	u_pw = request.forms.get('pw')
-	user_known = get_user_by_mail(u_email, u_pw)
+	user_info =	{
+		'u_f_name' : request.forms.get('first_name'),
+		'u_l_name' : request.forms.get('last_name'),
+		'u_name' : request.forms.get('nickname'),
+		'u_email' : request.forms.get('email'),
+		'u_pw' : request.forms.get('pw'),
+		'u_pw_r' : request.forms.get('r_pw')
+	}
+	input_validated, message = register_validation(user_info)
+	if not input_validated:
+		return registration(message=message, user_info=user_info)
+	user_known = get_user_by_mail(user_info['u_email'], user_info['u_pw'])
 	if not user_known:
 		new_user = User(
-			username=u_name, 
-			email=u_email, 
-			first_name=u_f_name,
-			last_name=u_l_name,
-			password=u_pw
+			username=user_info['u_name'], 
+			email=user_info['u_email'], 
+			first_name=user_info['u_f_name'],
+			last_name=user_info['u_l_name'],
+			password=user_info['u_pw']
 		)
 		new_user.save()
 		key = uuid4().hex
 		response.set_cookie('session_id', key, secret=SECRET)
 		session_dict[key] = new_user.id
 		info = {
-			'f_name' : u_f_name,
-			'l_name' : u_l_name,
+			'f_name' : user_info['u_f_name'],
+			'l_name' : user_info['u_l_name'],
 			'logged_in' : 'yes'
 		}
 		return template('thank_you.tpl', info)
