@@ -39,3 +39,13 @@ Methods: `is_published(): boolean`
 
 Fields: `author_email: str, body: str, created_at: datetime, post: Post`  
 Methods: ...
+
+## Restful Routes
+
+Nun, da wir User anlegen können und uns auch als User einloggen können, wird es Zeit, auch ohne Datenbankzugriff mit Usern interagieren zu können. Da wir einen Blog schreiben, wollen wir auch eine Übersicht über alle User(=Autoren) haben.
+
+Neue Routen:
+
+`GET /users` -> Zeige eine Liste mit allen Usern und Verlinkung auf die Detailseiten eines Users  
+`GET /users/{id}` -> wobei {id} eine variable Zahl ist. Zeigt die Detailseite eines Users an. Aktuell würde ich einfach Vorname und Nachname anzeigen, später kommen hier noch die Posts der User hin.  
+
