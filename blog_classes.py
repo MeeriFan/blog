@@ -1,9 +1,7 @@
-#from datetime import datetime
-#from datetime import date
 import hashlib
 from uuid import uuid4
 from peewee import SqliteDatabase, Model
-from peewee import CharField
+from peewee import CharField#, BooleanField
 
 db = SqliteDatabase('blog.db')
 
@@ -18,6 +16,7 @@ class User(BaseModel):
 	last_name = CharField(default='')
 	password = CharField(default='')
 	salt = CharField()
+	active = CharField(default='')
 
 	class Meta:
 		db_table = 'users'
@@ -28,27 +27,15 @@ class User(BaseModel):
 			self.first_name == '' or\
 			self.last_name == '' or\
 			self.password == '':
-			message = 'You have to fill out all fields.'
-			return False, message
-		"""
-		for attribute, value in self.__dict__.items():
-			for key, user_input in value.items():
-				if user_input == '':
-					message = 'You have to fill out all fields.'
-					return False, message
-		"""
+			return False, 'You have to fill out all fields.'
 		if not len(self.password) >= 8:
-			message = 'Your password needs to be at least 8 characters long.'
-			return False, message
+			return False, 'Your password needs to be at least 8 characters long.'
 		if not any(c.isalpha() for c in self.password):
-			message = 'Your password should at least contain one alphabetic character.'
-			return False, message
+			return False, 'Your password should at least contain one alphabetic character.'
 		if not self.password == repeated_pw:
-			message = 'The password and repeated password have to be the same.'
-			return False, message
+			return False, 'The password and repeated password have to be the same.'
 		if not '@' in self.email and not '.' in self.email:
-			message = 'Your email address is not valid.'
-			return False, message
+			return False, 'Your email address is not valid.'
 		return True, None
 
 	def is_already_in_db(self):
@@ -59,7 +46,7 @@ class User(BaseModel):
 		self.save()
 
 	def hash_password(self):
-		return hashlib.sha256(self.salt.encode()+self.password.encode()).hexdigest()
+		return hashlib.sha256(self.salt.encode() + self.password.encode()).hexdigest()
 
 	def verify_login(self):
 		db_user = self.get_db_user_by_mail()
@@ -84,3 +71,22 @@ class User(BaseModel):
 	def delete_user(user_id):
 		user = User.get_user(user_id)
 		user.delete_instance()
+
+	def deactivate_user(user_id):
+		user = User.get_user(user_id)
+		user.active = False
+		user.save()
+
+	def is_inactive(self):
+		return self.get_db_user_by_mail() != None
+
+	def reactivate_account(self):
+		knwon_user = self.get_db_user_by_mail()
+		self.salt = knwon_user.salt
+		self.password = self.hash_password()
+		knwon_user.password = self.password
+		knwon_user.active = True
+		knwon_user.save()
+		return knwon_user
+
+
