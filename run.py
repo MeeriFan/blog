@@ -57,9 +57,17 @@ def profile():
                                     + current_user.last_name + '!'
         info = {
             'message': message,
-            'current_user': logged_in()
+            'current_user': logged_in(),
+            'profile_text': current_user.profile_text
         }
         return template('profile.tpl', info)
+
+
+@app.post('/profile')
+def profile_description():
+    current_user = logged_in()
+    current_user.save_profile_text(request.forms.get('profile_text'))
+    return redirect('/profile')
 
 
 @app.route('/users')
@@ -76,12 +84,16 @@ def list_users():
 @app.route('/users/<user_id:int>')
 def specific_user(user_id):
     user = User.get_user(user_id)
-    info = {
-        'user': user,
-        'title': 'Profile of %s' % user.username,
-        'current_user': logged_in()
-    }
-    return template('single_user.tpl', info)
+    current_user = logged_in()
+    if current_user and current_user.id == user.id:
+        return redirect('/profile')
+    else:
+        info = {
+            'user': user,
+            'title': 'Profile of %s' % user.username,
+            'current_user': logged_in()
+        }
+        return template('single_user.tpl', info)
 
 
 @app.route('/login')

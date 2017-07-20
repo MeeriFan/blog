@@ -1,7 +1,7 @@
 import hashlib
 from uuid import uuid4
 from peewee import SqliteDatabase, Model
-from peewee import CharField
+from peewee import CharField, TextField
 
 db = SqliteDatabase('blog.db')
 
@@ -18,6 +18,7 @@ class User(BaseModel):
     last_name = CharField(default='')
     password = CharField(default='')
     salt = CharField()
+    profile_text = TextField(default='')
 
     class Meta:
         db_table = 'users'
@@ -80,3 +81,7 @@ class User(BaseModel):
 
     def get_all():
         return User.select()
+
+    def save_profile_text(self, profile_text):
+        self.profile_text = profile_text
+        self.save()
