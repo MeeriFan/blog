@@ -27,6 +27,7 @@
 					<li><a href="/profile">Your Profile</a></li>
 					<li><a id="logout" href="/logout">Logout</a></li>
 				% end
+				<li><a href="/users">Users</a></li>
 			</ul>
 		</nav>
 		{{!base}}
