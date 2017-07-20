@@ -69,17 +69,28 @@ def login_form_failed():
 	}
 	return template('login.tpl', info)
 
+@app.route('/login/inactive')
+def account_inactive():
+	info = {
+		'title' : 'Login',
+		'message' : 'Your account is inactive. Please reactivate.',
+		'logged_in' : 'no',
+		'link' : 'Reactivate my account'
+	}
+	return template('login.tpl', info)
+
 @app.post('/login')
 @app.post('/login/failed')
+@app.post('/login/inactive')
 def do_login():
 	user = User(
 		email=request.forms.get('email'),
 		password=request.forms.get('pw')
 	)
 	if user.verify_login():
-		user = user.get_db_user_by_mail()
+		user = User.by_email(user.email)
 		if not user.active:
-			return redirect('/login/failed')
+			return redirect('/login/inactive')
 		else:
 			set_app_cookie(user.id)
 			message = 'Welcome back, ' + user.username + '!'
@@ -138,6 +149,14 @@ def do_registration():
 			return template('thank_you.tpl', info)
 		else:
 			return registration(message=error, u=new_user, r_pw=repeated_passwpord) 
+	else:
+		info = {
+			'message' : 'You are already registered.',
+			'href' : 'registration',
+			'logged_in' : 'no'
+		}
+		return template('error.tpl', info)
+	"""
 	elif new_user.is_inactive():
 		knwon_user = new_user.reactivate_account()
 		set_app_cookie(knwon_user.id)
@@ -148,13 +167,14 @@ def do_registration():
 			'logged_in' : 'yes'
 		}
 		return template('thank_you.tpl', info)
-	else:
-		info = {
-			'message' : 'You are already registered.',
-			'href' : 'registration',
-			'logged_in' : 'no'
-		}
-		return template('error.tpl', info)
+	"""
+	
+
+"""
+@app.route('/reactivate')
+def reactivate_form():
+	info
+"""
 
 @app.route('/deactivate')
 def deactivate_user():
