@@ -23,6 +23,7 @@
 				% if logged_in == 'no':
 					<li><a href="/login">Login</a></li>
 					<li><a href="/registration">Registration</a></li>
+					<li><a href="/reactivate">Reactivate account</a></li>
 				% else:
 					<li><a href="/profile">Your Profile</a></li>
 					<li><a id="logout" href="/logout">Logout</a></li>
