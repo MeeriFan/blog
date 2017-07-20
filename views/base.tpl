@@ -20,7 +20,7 @@
 		<h1>Blog</h1>
 		<nav>
 			<ul>
-				% if logged_in == 'no':
+				% if not current_user:
 					<li><a href="/login">Login</a></li>
 					<li><a href="/registration">Registration</a></li>
 				% else:

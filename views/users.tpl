@@ -16,5 +16,6 @@
 				<td>{{user.last_name}}</td>
 				<td><a href="/users/{{user.id}}">{{user.username}}'s Profile</a></td>
 			</tr>
+		% end
 	</table>
 % end
