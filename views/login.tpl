@@ -3,6 +3,10 @@
 <form method="post" action="/login">
 	<fieldset>
 		<p>{{message}}</p>
+		% if link:
+			<br>
+			<a href="/reactivate">{{link}}</a>
+		% end
 		<ul>
 			<li>Email: <input type="email" name="email"></li>
 			<li>Password: <input type="password" name="pw"></li>
