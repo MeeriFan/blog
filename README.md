@@ -39,3 +39,24 @@ Methods: `is_published(): boolean`
 
 Fields: `author_email: str, body: str, created_at: datetime, post: Post`  
 Methods: ...
+
+## Restful Routes
+
+Nun, da wir User anlegen können und uns auch als User einloggen können, wird es Zeit, auch ohne Datenbankzugriff mit Usern interagieren zu können. Da wir einen Blog schreiben, wollen wir auch eine Übersicht über alle User(=Autoren) haben.
+
+Neue Routen:
+
+`GET /users` -> Zeige eine Liste mit allen Usern und Verlinkung auf die Detailseiten eines Users  
+`GET /users/{userid}` -> wobei {userid} eine variable Zahl ist. Zeigt die Detailseite eines Users an. Aktuell würde ich einfach Vorname und Nachname anzeigen, später kommen hier noch die Posts der User hin.  
+
+## Userprofil
+
+Ein User braucht einen Profiltext, der frei befüllbar sein soll. Das ist eine Fingerübung für das Verfassen von Posts.
+
+* wenn ich eingeloggt bin und mein Profil besuche
+  * kann ich in einer `textarea` einen Profiltext editieren und speichern
+* wenn ich das Profil anderer User besuche, kann ich deren Profiltext nur lesen, aber nicht bearbeiten
+
+Dazu braucht die Usertabelle ein neues Feld. Achte auf den korrekten Datentyp in SQLite: TEXT
+
+Bearbeiten kann ich mein Profil unter `GET /profile`. Das Formular soll Updates per `POST` an `/profile` senden. Später werden wir das ändern.

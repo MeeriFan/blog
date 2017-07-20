@@ -8,8 +8,8 @@
 			<li>Last name: <input type="text" name="last_name" value="{{u_l_name}}"></li>
 			<li>Nickname: <input type="text" name="nickname" value="{{u_name}}"></li>
 			<li>Email: <input type="email" name="email" value="{{u_email}}"></li>
-			<li>Password: <input type="password" name="pw" value="{{u_pw}}"></li>
-			<li>Repeat password: <input type="password" name="r_pw" value="{{u_pw_r}}"></li>
+			<li>Password: <input type="password" name="pw"></li>
+			<li>Repeat password: <input type="password" name="r_pw"></li>
 		</ul>
 		<input type="submit" name="registration">
 	</fieldset>
