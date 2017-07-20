@@ -116,20 +116,8 @@ def login_form_failed():
     return template('login.tpl', info)
 
 
-@app.route('/login/inactive')
-def account_inactive():
-    info = {
-        'title': 'Login',
-        'message': 'Your account is inactive. Please reactivate.',
-        'current_user': logged_in(),
-        'link': 'Reactivate my account'
-    }
-    return template('login.tpl', info)
-
-
 @app.post('/login')
 @app.post('/login/failed')
-@app.post('/login/inactive')
 def do_login():
     user = User(
         email=request.forms.get('email'),
