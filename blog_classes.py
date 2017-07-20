@@ -49,7 +49,7 @@ class User(BaseModel):
 		return hashlib.sha256(self.salt.encode() + self.password.encode()).hexdigest()
 
 	def verify_login(self):
-		db_user = self.get_db_user_by_mail()
+		db_user = User.by_email(self.email)
 		if not db_user:
 			return False
 		self.salt = db_user.salt
@@ -59,9 +59,9 @@ class User(BaseModel):
 			User.password == self.password
 		).exists()
 
-	def get_db_user_by_mail(self):
+	def by_email(mail):
 		try:
-			return User.get(User.email == self.email)
+			return User.get(User.email == mail)
 		except:
 			return None
 
@@ -77,16 +77,16 @@ class User(BaseModel):
 		user.active = False
 		user.save()
 
+"""
 	def is_inactive(self):
-		return self.get_db_user_by_mail() != None
+		return User.by_email(self.email) != None
 
 	def reactivate_account(self):
-		knwon_user = self.get_db_user_by_mail()
-		self.salt = knwon_user.salt
+		known_user = User.by_email(self.email)
+		self.salt = known_user.salt
 		self.password = self.hash_password()
-		knwon_user.password = self.password
-		knwon_user.active = True
-		knwon_user.save()
-		return knwon_user
-
-
+		known_user.password = self.password
+		known_user.active = True
+		known_user.save()
+		return known_user
+"""
