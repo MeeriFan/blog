@@ -43,8 +43,8 @@ session_dict = {}
 SECRET = 'dogcatmouse'
 
 
-@app.route('/profile')
-def profile():
+@app.route('/users/<user_id:int>/editprofile')
+def edit_profile(user_id):
     current_user = logged_in()
     if not current_user:
         info = {
@@ -54,22 +54,14 @@ def profile():
         }
         return template('error.tpl', info)
     else:
-        message = 'Welcome back, ' + current_user.first_name + ' ' \
-                                    + current_user.last_name + '!'
-        info = {
-            'message': message,
-            'current_user': logged_in(),
-            'profile_text': current_user.profile_text,
-            'posts': current_user.posts.order_by(Post.created_at.desc())
-        }
-        return template('profile.tpl', info)
+        return template('edit_profile.tpl', current_user=current_user)
 
 
-@app.post('/profile')
-def profile_description():
+@app.post('/users/<user_id:int>/editprofile')
+def save_profile_description(user_id):
     current_user = logged_in()
     current_user.save_profile_text(request.forms.profile_text)
-    return redirect('/profile')
+    return redirect('/users/'+str(current_user.id))
 
 
 @app.route('/users')
@@ -88,15 +80,25 @@ def specific_user(user_id):
     user = User.get_user(user_id)
     current_user = logged_in()
     if current_user and current_user.id == user.id:
-        return redirect('/profile')
+        message = 'Hello ' + current_user.first_name + ' ' \
+                            + current_user.last_name + '!'
+        info = {
+            'title': message,
+            'current_user': current_user,
+            'posts': current_user.posts.order_by(Post.created_at.desc()),
+            'user': current_user,
+            'self': 'yes'
+        }
+        return template('profile.tpl', info)
     else:
         info = {
             'user': user,
             'title': 'Profile of %s' % user.username,
-            'current_user': logged_in(),
-            'posts': user.posts.order_by(Post.created_at.desc())
+            'current_user': current_user,
+            'posts': user.posts.order_by(Post.created_at.desc()),
+            'self': 'no'
         }
-        return template('single_user.tpl', info)
+        return template('profile.tpl', info)
 
 
 @app.route('/login')
@@ -129,7 +131,7 @@ def do_login():
     if user.verify_login():
         user = User.by_email(user.email)
         set_app_cookie(user.id)
-        return redirect('/profile')
+        return redirect('/users/'+str(user.id))
     else:
         return redirect('/login/failed')
 

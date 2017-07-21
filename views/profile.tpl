@@ -1,21 +1,41 @@
 %rebase('base.tpl')
-<p>{{message}}</p>
-% if current_user:
-	<form method="post" action="/profile">
-		<textarea placeholder="Describe yourself..." name='profile_text' rows="30" cols="100">
-% if not current_user.profile_text == '':
-{{current_user.profile_text}}
-% end
-</textarea>
-		<br>
-		<input type="submit" name="submit" value="Save">
-	</form>
-% end
-<a href="/delete">Delete my profile</a>
+<h2>{{title}}</h2>
 <br>
+% if self == 'yes':
+    <a href="/delete">Delete my profile</a>
+    <br>
+    <a href="/users/{{current_user.id}}/editprofile">Edit my Profiletext</a>
+    <br>
+    <h5>What I say about myself:</h5>
+    % if current_user.profile_text == '':
+        <p>Describe <a href="/users/{{current_user.id}}/editprofile">yourself</a>.</p>
+    % else:
+        <p>{{current_user.profile_text}}</p>
+    % end
+    <h5>My Posts:</h5>
+% else:
+    <h5>What I can tell you about myself:</h5>
+    % if user.profile_text == '':
+        <p>{{user.username}} can't tell you anything...</p>
+    % else:
+        <p>{{user.profile_text}}</p>      
+    % end
+    <h5>{{user.username}}'s Posts</h5>  
+% end
+
+% if len(posts) == 0:
+    % if self == 'yes':
+        <p><p>Write your first <a href="/users/{{current_user.id}}/newpost">post.</a></p></p>
+    % else:
+        <p>{{user.username}} didn't post anything, yet.</p>
+    % end
+% else:
+    % for post in posts:
+        <h3>{{post.title}}</h3>
+        <p>Created at: {{post.created_at}}</p>
+        <p>{{post.body}}</p>
+    % end
+% end
 <a href="/index">Back to main page</a>
-<br>
-% if current_user:
-    <h2>List of your posts</h2>
-    % include('user_posts.tpl')
-% end
+
+
