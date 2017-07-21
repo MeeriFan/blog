@@ -1,7 +1,7 @@
 import hashlib
 from uuid import uuid4
 from peewee import SqliteDatabase, Model
-from peewee import CharField, TextField
+from peewee import CharField, TextField, ForeignKeyField
 
 db = SqliteDatabase('blog.db')
 
@@ -28,11 +28,14 @@ class User(BaseModel):
                   self.last_name, self.password]:
             return False, 'You have to fill out all fields.'
         if not len(self.password) >= 8:
-            return False, 'Your password needs to be at least 8 characters long.'
+            return False, 'Your password needs to be \
+                        at least 8 characters long.'
         if not any(c.isalpha() for c in self.password):
-            return False, 'Your password should at least contain one alphabetic character.'
+            return False, 'Your password should at least contain \
+                                        one alphabetic character.'
         if not self.password == repeated_pw:
-            return False, 'The password and repeated password have to be the same.'
+            return False, 'The password and repeated password \
+                                        have to be the same.'
         if '@' not in self.email and '.' not in self.email:
             return False, 'Your email address is not valid.'
         return True, None
@@ -45,7 +48,9 @@ class User(BaseModel):
         self.save()
 
     def hash_password(self):
-        return hashlib.sha256(self.salt.encode() + self.password.encode()).hexdigest()
+        return hashlib.sha256(
+            self.salt.encode() + self.password.encode()
+            ).hexdigest()
 
     def verify_login(self):
         db_user = User.by_email(self.email)
@@ -85,3 +90,12 @@ class User(BaseModel):
     def save_profile_text(self, profile_text):
         self.profile_text = profile_text
         self.save()
+
+
+class Post(BaseModel):
+    user = ForeignKeyField(User, related_name='posts')
+    title = CharField(default='')
+    body = TextField(default='')
+
+    class Meta:
+        db_table = 'posts'
