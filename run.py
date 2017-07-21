@@ -237,6 +237,12 @@ def do_delete():
     return template('sorry.tpl', info)
 
 
+@app.route('/users/<user_id:int>/newpost')
+def new_post(user_id):
+    current_user = logged_in()
+    return template('new_post.tpl', current_user=current_user)
+
+
 @app.route('/static/<path:path>')
 def static_files(path):
     return static_file(path, 'static/')
