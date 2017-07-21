@@ -2,6 +2,7 @@ import hashlib
 from uuid import uuid4
 from peewee import SqliteDatabase, Model
 from peewee import CharField, TextField, ForeignKeyField
+from peewee import DateTimeField
 
 db = SqliteDatabase('blog.db')
 
@@ -96,6 +97,12 @@ class Post(BaseModel):
     user = ForeignKeyField(User, related_name='posts')
     title = CharField(default='')
     body = TextField(default='')
+    created_at = DateTimeField()
 
     class Meta:
         db_table = 'posts'
+
+    def get_posts(user):
+        return Post.select().where(
+            Post.user == user
+        ).order_by(Post.created_at.desc())
