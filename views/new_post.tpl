@@ -1,4 +1,7 @@
 % rebase('base.tpl')
+% if not current_user:
+<p>You must be logged in to generate a new Post</p>
+% else:
 <form action="/users/{{current_user.id}}/newpost" method="post">
     <fieldset>
         <legend>New Post</legend>
@@ -10,3 +13,4 @@
         <input type="submit" name="save" value="Save">
     </fieldset>
 </form>
+% end
