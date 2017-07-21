@@ -1,7 +1,8 @@
 from bottle import template, Bottle, debug, run, request, response
 from bottle import redirect, static_file
 from uuid import uuid4
-from blog_classes import User
+from blog_classes import User, Post
+from datetime import datetime
 
 app = Bottle()
 
@@ -48,17 +49,19 @@ def profile():
     if not current_user:
         info = {
             'message': 'You must be logged in.',
-            'current_user': logged_in(),
+            'current_user': current_user,
             'href': 'index'
         }
         return template('error.tpl', info)
     else:
         message = 'Welcome back, ' + current_user.first_name + ' ' \
                                     + current_user.last_name + '!'
+        list_posts = Post.get_posts(current_user)
         info = {
             'message': message,
             'current_user': logged_in(),
-            'profile_text': current_user.profile_text
+            'profile_text': current_user.profile_text,
+            'posts': list_posts
         }
         return template('profile.tpl', info)
 
@@ -129,7 +132,8 @@ def do_login():
         message = 'Welcome back, ' + user.username + '!'
         info = {
             'message': message,
-            'current_user': user
+            'current_user': user,
+            'posts': Post.get_posts(user)
         }
         return template('profile.tpl', info)
     else:
@@ -241,6 +245,19 @@ def do_delete():
 def new_post(user_id):
     current_user = logged_in()
     return template('new_post.tpl', current_user=current_user)
+
+
+@app.post('/users/<user_id:int>/newpost')
+def save_post(user_id):
+    current_user = logged_in()
+    new_post = Post(
+        title=request.forms.title,
+        body=request.forms.body,
+        user=current_user,
+        created_at=datetime.now()
+    )
+    new_post.save()
+    return redirect('/profile')
 
 
 @app.route('/static/<path:path>')
