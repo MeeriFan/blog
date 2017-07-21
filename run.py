@@ -66,7 +66,7 @@ def profile():
 @app.post('/profile')
 def profile_description():
     current_user = logged_in()
-    current_user.save_profile_text(request.forms.get('profile_text'))
+    current_user.save_profile_text(request.forms.profile_text)
     return redirect('/profile')
 
 
