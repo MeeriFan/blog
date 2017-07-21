@@ -101,8 +101,3 @@ class Post(BaseModel):
 
     class Meta:
         db_table = 'posts'
-
-    def get_posts(user):
-        return Post.select().where(
-            Post.user == user
-        ).order_by(Post.created_at.desc())
