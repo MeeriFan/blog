@@ -24,6 +24,7 @@
 					<li><a href="/login">Login</a></li>
 					<li><a href="/registration">Registration</a></li>
 				% else:
+					<li><a href="users/{{current_user.id}}/newpost">Write a new Post</a></li>
 					<li><a href="/profile">Your Profile</a></li>
 					<li><a id="logout" href="/logout">Logout</a></li>
 				% end
