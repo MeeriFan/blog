@@ -56,12 +56,11 @@ def profile():
     else:
         message = 'Welcome back, ' + current_user.first_name + ' ' \
                                     + current_user.last_name + '!'
-        list_posts = Post.get_posts(current_user)
         info = {
             'message': message,
             'current_user': logged_in(),
             'profile_text': current_user.profile_text,
-            'posts': list_posts
+            'posts': current_user.posts.order_by(Post.created_at.desc())
         }
         return template('profile.tpl', info)
 
@@ -94,7 +93,8 @@ def specific_user(user_id):
         info = {
             'user': user,
             'title': 'Profile of %s' % user.username,
-            'current_user': logged_in()
+            'current_user': logged_in(),
+            'posts': user.posts.order_by(Post.created_at.desc())
         }
         return template('single_user.tpl', info)
 
@@ -129,13 +129,7 @@ def do_login():
     if user.verify_login():
         user = User.by_email(user.email)
         set_app_cookie(user.id)
-        message = 'Welcome back, ' + user.username + '!'
-        info = {
-            'message': message,
-            'current_user': user,
-            'posts': Post.get_posts(user)
-        }
-        return template('profile.tpl', info)
+        return redirect('/profile')
     else:
         return redirect('/login/failed')
 
