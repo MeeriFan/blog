@@ -86,8 +86,7 @@ def specific_user(user_id):
             'title': message,
             'current_user': current_user,
             'posts': current_user.posts.order_by(Post.created_at.desc()),
-            'user': current_user,
-            'self': 'yes'
+            'user': current_user
         }
         return template('profile.tpl', info)
     else:
@@ -95,8 +94,7 @@ def specific_user(user_id):
             'user': user,
             'title': 'Profile of %s' % user.username,
             'current_user': current_user,
-            'posts': user.posts.order_by(Post.created_at.desc()),
-            'self': 'no'
+            'posts': user.posts.order_by(Post.created_at.desc())
         }
         return template('profile.tpl', info)
 
