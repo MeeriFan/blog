@@ -1,6 +1,6 @@
 % rebase('base.tpl')
 % if not current_user:
-<p>You must be logged in to generate a new Post</p>
+% include('login_error.tpl')
 % else:
 <form action="/users/{{current_user.id}}/newpost" method="post">
     <fieldset>
@@ -8,7 +8,7 @@
         Title: <input type="text" name="title" placeholder="Title of your post">
         <br>
         <br>
-        <textarea rows="30" cols="100" placeholder="Please write your post here...."></textarea>
+        <textarea name="body" rows="30" cols="100" placeholder="Please write your post here...."></textarea>
         <br>
         <input type="submit" name="save" value="Save">
     </fieldset>
