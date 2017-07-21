@@ -14,3 +14,8 @@
 <a href="/delete">Delete my profile</a>
 <br>
 <a href="/index">Back to main page</a>
+<br>
+% if current_user:
+    <h2>List of your posts</h2>
+    % include('user_posts.tpl')
+% end
