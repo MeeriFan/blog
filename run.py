@@ -255,7 +255,7 @@ def save_post(user_id):
         created_at=datetime.now()
     )
     new_post.save()
-    return redirect('/profile')
+    return redirect('/users/'+str(current_user.id))
 
 
 @app.route('/static/<path:path>')
