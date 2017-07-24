@@ -220,8 +220,8 @@ def do_deactivate():
     return template('sorry.tpl', info)
 
 
-@app.route('/delete')
-def delete_account():
+@app.route('/users/<user_id:int>/delete')
+def delete_account(user_id):
     info = {
         'title': 'Good Bye?',
         'message': 'You really want to delete your account? This means that your \
@@ -232,9 +232,9 @@ def delete_account():
     return template('delete.tpl', info)
 
 
-@app.post('/delete')
-def do_delete():
-    User.delete_user(session_dict[get_key()])
+@app.post('/users/<user_id:int>/delete')
+def do_delete(user_id):
+    User.delete_user(user_id)
     delete_app_cookie()
     info = {
         'current_user': logged_in(),

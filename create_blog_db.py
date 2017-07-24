@@ -1,4 +1,5 @@
 import peewee
+import sys
 from blog_classes import User, Post
 from blog_classes import db
 
@@ -9,7 +10,7 @@ def create_tables():
         safe=True)
 
 if __name__ == '__main__':
-    print('Creating tables...')
+    sys.stderr.write('Creating tables...')
     db.connect()
     create_tables()
     db.close()

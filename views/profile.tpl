@@ -2,7 +2,7 @@
 <h2>{{title}}</h2>
 <br>
 % if current_user == user:
-    <a href="/delete">Delete my profile</a>
+    <a href="/users/{{current_user.id}}/delete">Delete my profile</a>
     <br>
     <a href="/users/{{current_user.id}}/editprofile">Edit my Profiletext</a>
     <br>
