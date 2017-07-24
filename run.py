@@ -35,7 +35,11 @@ def logged_in():
 @app.route('/')
 @app.route('/index')
 def index():
-    return template('index.tpl', current_user=logged_in())
+    info = {
+        'current_user': logged_in(),
+        'posts': Post.select().order_by(Post.created_at.desc())
+    }
+    return template('index.tpl', info)
 
 
 session_dict = {}
@@ -256,6 +260,15 @@ def save_post(user_id):
     )
     new_post.save()
     return redirect('/users/'+str(current_user.id))
+
+
+@app.route('/users/<user_id:int>/posts/<post_id:int>')
+def all_posts(user_id, post_id):
+    info = {
+        'current_user': logged_in(),
+        'post': Post.get_post(post_id)
+    }
+    return template('single_post.tpl', info)
 
 
 @app.route('/static/<path:path>')
