@@ -32,10 +32,12 @@
 % else:
     % for post in posts:
         <h3>{{post.title}}</h3>
-        <p>Created at: {{post.created_at}}</p>
-        {{!post.render_body()}}
+        <p>Created at: {{post.nice_date()}}</p>
+        {{!post.get_abstract()}}<a href="/users/{{post.user.id}}/posts/{{post.id}}">...read more.</a>
     % end
 % end
-<a href="/index">Back to main page</a>
+<br>
+<br>
+<a href="/users">Back</a>
 
 
