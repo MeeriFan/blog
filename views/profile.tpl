@@ -33,7 +33,7 @@
     % for post in posts:
         <h3>{{post.title}}</h3>
         <p>Created at: {{post.created_at}}</p>
-        <p>{{post.body}}</p>
+        {{!post.render_body()}}
     % end
 % end
 <a href="/index">Back to main page</a>
