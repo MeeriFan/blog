@@ -54,7 +54,11 @@ def edit_profile(user_id):
         }
         return template('error.tpl', info)
     else:
-        return template('edit_profile.tpl', current_user=current_user)
+        info = {
+            'current_user': current_user,
+            'profile_text': current_user.profile_text
+        }
+        return template('edit_profile.tpl', info)
 
 
 @app.post('/users/<user_id:int>/editprofile')
