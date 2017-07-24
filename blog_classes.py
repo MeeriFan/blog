@@ -3,6 +3,7 @@ from uuid import uuid4
 from peewee import SqliteDatabase, Model
 from peewee import CharField, TextField, ForeignKeyField
 from peewee import DateTimeField
+from markdown import markdown
 
 db = SqliteDatabase('blog.db')
 
@@ -101,3 +102,6 @@ class Post(BaseModel):
 
     class Meta:
         db_table = 'posts'
+
+    def render_body(self):
+        return markdown(self.body, output_format='html5')
