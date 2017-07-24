@@ -3,5 +3,5 @@
 <form method="post" action="/delete">
 	<p>{{message}}</p>
 	<input type="submit" name="delete" value="Yes">
-	<a href="/profile">No</a>
+	<a href="/users/{{current_user.id}}">No</a>
 </form>

@@ -1,0 +1,1 @@
+<p>You must be logged in to generate a new Post</p>

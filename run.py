@@ -1,7 +1,8 @@
 from bottle import template, Bottle, debug, run, request, response
 from bottle import redirect, static_file
 from uuid import uuid4
-from blog_classes import User
+from blog_classes import User, Post
+from datetime import datetime
 
 app = Bottle()
 
@@ -34,7 +35,11 @@ def logged_in():
 @app.route('/')
 @app.route('/index')
 def index():
-    return template('index.tpl', current_user=logged_in())
+    info = {
+        'current_user': logged_in(),
+        'posts': Post.select().order_by(Post.created_at.desc())
+    }
+    return template('index.tpl', info)
 
 
 session_dict = {}
@@ -42,32 +47,29 @@ session_dict = {}
 SECRET = 'dogcatmouse'
 
 
-@app.route('/profile')
-def profile():
+@app.route('/users/<user_id:int>/editprofile')
+def edit_profile(user_id):
     current_user = logged_in()
     if not current_user:
         info = {
             'message': 'You must be logged in.',
-            'current_user': logged_in(),
+            'current_user': current_user,
             'href': 'index'
         }
         return template('error.tpl', info)
     else:
-        message = 'Welcome back, ' + current_user.first_name + ' ' \
-                                    + current_user.last_name + '!'
         info = {
-            'message': message,
-            'current_user': logged_in(),
+            'current_user': current_user,
             'profile_text': current_user.profile_text
         }
-        return template('profile.tpl', info)
+        return template('edit_profile.tpl', info)
 
 
-@app.post('/profile')
-def profile_description():
+@app.post('/users/<user_id:int>/editprofile')
+def save_profile_description(user_id):
     current_user = logged_in()
     current_user.save_profile_text(request.forms.profile_text)
-    return redirect('/profile')
+    return redirect('/users/'+str(current_user.id))
 
 
 @app.route('/users')
@@ -86,14 +88,23 @@ def specific_user(user_id):
     user = User.get_user(user_id)
     current_user = logged_in()
     if current_user and current_user.id == user.id:
-        return redirect('/profile')
+        message = 'Hello ' + current_user.first_name + ' ' \
+                            + current_user.last_name + '!'
+        info = {
+            'title': message,
+            'current_user': current_user,
+            'posts': current_user.posts.order_by(Post.created_at.desc()),
+            'user': current_user
+        }
+        return template('profile.tpl', info)
     else:
         info = {
             'user': user,
             'title': 'Profile of %s' % user.username,
-            'current_user': logged_in()
+            'current_user': current_user,
+            'posts': user.posts.order_by(Post.created_at.desc())
         }
-        return template('single_user.tpl', info)
+        return template('profile.tpl', info)
 
 
 @app.route('/login')
@@ -126,12 +137,7 @@ def do_login():
     if user.verify_login():
         user = User.by_email(user.email)
         set_app_cookie(user.id)
-        message = 'Welcome back, ' + user.username + '!'
-        info = {
-            'message': message,
-            'current_user': user
-        }
-        return template('profile.tpl', info)
+        return redirect('/users/'+str(user.id))
     else:
         return redirect('/login/failed')
 
@@ -214,8 +220,8 @@ def do_deactivate():
     return template('sorry.tpl', info)
 
 
-@app.route('/delete')
-def delete_account():
+@app.route('/users/<user_id:int>/delete')
+def delete_account(user_id):
     info = {
         'title': 'Good Bye?',
         'message': 'You really want to delete your account? This means that your \
@@ -226,15 +232,43 @@ def delete_account():
     return template('delete.tpl', info)
 
 
-@app.post('/delete')
-def do_delete():
-    User.delete_user(session_dict[get_key()])
+@app.post('/users/<user_id:int>/delete')
+def do_delete(user_id):
+    User.delete_user(user_id)
     delete_app_cookie()
     info = {
         'current_user': logged_in(),
         'specification': 'deleted'
     }
     return template('sorry.tpl', info)
+
+
+@app.route('/users/<user_id:int>/newpost')
+def new_post(user_id):
+    current_user = logged_in()
+    return template('new_post.tpl', current_user=current_user)
+
+
+@app.post('/users/<user_id:int>/newpost')
+def save_post(user_id):
+    current_user = logged_in()
+    new_post = Post(
+        title=request.forms.title,
+        body=request.forms.body,
+        user=current_user,
+        created_at=datetime.now()
+    )
+    new_post.save()
+    return redirect('/users/'+str(current_user.id))
+
+
+@app.route('/users/<user_id:int>/posts/<post_id:int>')
+def all_posts(user_id, post_id):
+    info = {
+        'current_user': logged_in(),
+        'post': Post.get_post(post_id)
+    }
+    return template('single_post.tpl', info)
 
 
 @app.route('/static/<path:path>')
