@@ -37,7 +37,7 @@ class User(BaseModel):
         if not self.password == repeated_pw:
             return False, 'The password and repeated password \
                                         have to be the same.'
-        if '@' not in self.email and '.' not in self.email:
+        if '@' not in self.email:
             return False, 'Your email address is not valid.'
         return True, None
 
