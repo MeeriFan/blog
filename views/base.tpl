@@ -20,6 +20,7 @@
 		<h1>Blog</h1>
 		<nav>
 			<ul>
+				<li><a href="/">Mainpage</a></li>
 				% if not current_user:
 					<li><a href="/login">Login</a></li>
 					<li><a href="/registration">Registration</a></li>
