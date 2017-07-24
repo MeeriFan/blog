@@ -5,7 +5,8 @@
 <form action="/users/{{current_user.id}}/newpost" method="post">
     <fieldset>
         <legend>New Post</legend>
-        Title: <input type="text" name="title" placeholder="Title of your post">
+        <label for="title">Title of your post: </label>
+        <input id="title" type="text" name="title">
         <br>
         <br>
         <textarea name="body" rows="30" cols="100" placeholder="Please write your post here...."></textarea>
