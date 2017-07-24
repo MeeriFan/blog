@@ -4,6 +4,7 @@ from peewee import SqliteDatabase, Model
 from peewee import CharField, TextField, ForeignKeyField
 from peewee import DateTimeField
 from markdown import markdown
+import datetime
 
 db = SqliteDatabase('blog.db')
 
@@ -105,3 +106,15 @@ class Post(BaseModel):
 
     def render_body(self):
         return markdown(self.body, output_format='html5')
+
+    def get_abstract(self):
+        return markdown(self.body[:50], output_format='html5')
+
+    def get_post(post_id):
+        try:
+            return Post.get(Post.id == post_id)
+        except:
+            return None
+
+    def nice_date(self):
+        return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
