@@ -23,7 +23,7 @@
     <h5>{{user.username}}'s Posts</h5>  
 % end
 
-% include('posts.tpl')
+% include('post_looop.tpl')
 <br>
 <br>
 <a href="/users">Back</a>

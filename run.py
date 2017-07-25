@@ -263,7 +263,7 @@ def save_post(user_id):
 
 
 @app.route('/users/<user_id:int>/posts')
-def all_posts(user_id):
+def all_user_posts(user_id):
     user = User.get_user(user_id)
     info = {
         'current_user': logged_in(),
@@ -274,7 +274,7 @@ def all_posts(user_id):
 
 
 @app.route('/users/<user_id:int>/posts/<post_id:int>')
-def one_posts(user_id, post_id):
+def one_post(user_id, post_id):
     info = {
         'current_user': logged_in(),
         'post': Post.get_post(post_id)
