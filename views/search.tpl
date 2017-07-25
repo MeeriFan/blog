@@ -3,7 +3,7 @@
     <fieldset>
         <legend>Search for Post</legend>
         <br>
-        <input type="text" name="search"><input type="submit" name="Submit" value="">
+        <input type="text" name="q"><input type="submit" name="Submit" value="">
     </fieldset>
 </form>
 <a href="/index">Back to mainpage</a>

@@ -271,6 +271,11 @@ def all_posts(user_id, post_id):
     return template('single_post.tpl', info)
 
 
+@app.route('/search')
+def search_post():
+    return template('search.tpl')
+
+
 @app.route('/static/<path:path>')
 def static_files(path):
     return static_file(path, 'static/')
