@@ -12,7 +12,9 @@
 % else:
 	% for post in posts:
     	<h3>{{post.title}}</h3>
+    	<p>Author: {{post.user.username}}</p>
     	<p>Created at: {{post.nice_date()}}</p>
     	{{!post.get_abstract()}}<a href="/users/{{post.user.id}}/posts/{{post.id}}">...read more.</a>
+    	<p>-----------------------------------------</p>
 	% end
 % end
