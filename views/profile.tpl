@@ -26,6 +26,6 @@
 % include('posts.tpl')
 <br>
 <br>
+% from blog_classes import User
 <a href="{{!User.index_path()}}">Back</a>
-
 

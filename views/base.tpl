@@ -29,6 +29,7 @@
 					<li><a href="{{!current_user.path()}}">Your Profile</a></li>
 					<li><a id="logout" href="/logout">Logout</a></li>
 				% end
+				% from blog_classes import User
 				<li><a href="{{!User.index_path()}}">Users</a></li>
 			</ul>
 			% include('search.tpl', search_term='')
