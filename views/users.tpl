@@ -9,12 +9,14 @@
 			<th>Firstname</th>
 			<th>Lastname</th>
 			<th>Link to Profile</th>
+			<th>Link to Posts</th>
 		</tr>
 		% for user in users:
 			<tr>
 				<td>{{user.first_name}}</td>
 				<td>{{user.last_name}}</td>
 				<td><a href="/users/{{user.id}}">{{user.username}}'s Profile</a></td>
+				<td><a href="/users/{{user.id}}/posts">{{user.username}}'s Posts</a></td>
 			</tr>
 		% end
 	</table>
