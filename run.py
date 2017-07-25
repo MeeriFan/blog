@@ -282,6 +282,17 @@ def one_post(user_id, post_id):
     return template('single_post.tpl', info)
 
 
+@app.route('/search')
+def search_post():
+    searchword = request.query.q
+    info = {
+        'current_user': logged_in(),
+        'posts': Post.matching_posts(searchword),
+        'search_term': searchword
+    }
+    return template('search.tpl', info)
+
+
 @app.route('/static/<path:path>')
 def static_files(path):
     return static_file(path, 'static/')
