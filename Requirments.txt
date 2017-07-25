@@ -1,0 +1,4 @@
+Python=3.6.1
+peewee=2.10.1
+bottle=0.12.13
+Markdown=2.6.8
