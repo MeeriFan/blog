@@ -118,3 +118,10 @@ class Post(BaseModel):
 
     def nice_date(self):
         return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
+
+    def matching_posts(searchword):
+        matched_posts = []
+        for post in Post.select().order_by(Post.created_at.desc()):
+            if searchword in post.title or searchword in post.body:
+                matched_posts.append(post)
+        return matched_posts

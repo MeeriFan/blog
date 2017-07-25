@@ -273,7 +273,13 @@ def all_posts(user_id, post_id):
 
 @app.route('/search')
 def search_post():
-    return template('search.tpl')
+    searchword = request.query.q
+    matched_posts = Post.matching_posts(searchword)
+    info = {
+        'current_user': logged_in(),
+        'posts': matched_posts
+    }
+    return template('search.tpl', info)
 
 
 @app.route('/static/<path:path>')
