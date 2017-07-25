@@ -276,7 +276,8 @@ def search_post():
     searchword = request.query.q
     info = {
         'current_user': logged_in(),
-        'posts': Post.matching_posts(searchword)
+        'posts': Post.matching_posts(searchword),
+        'word': searchword
     }
     return template('search.tpl', info)
 
