@@ -95,10 +95,10 @@ class User(BaseModel):
         self.save()
 
     def path(self):
-        return '/users/' + str(self.id)
+        return '/users/%d' % self.id
 
-    def post_path(self):
-        return '/users/' + str(self.id) + '/posts'
+    def posts_path(self):
+        return '/users/%d/posts' % self.id
 
     def index_path():
         return '/users'
@@ -133,5 +133,5 @@ class Post(BaseModel):
             Post.body.contains(searchword) | Post.title.contains(searchword)
         )
 
-    def detail_path(self):
-        return '/users/' + str(self.user.id) + '/posts/' + str(self.id)
+    def path(self):
+        return '/users/%d/posts/%d' % (self.user.id, self.id)

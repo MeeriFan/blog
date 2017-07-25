@@ -4,6 +4,6 @@
 	<h3>{{post.title}}</h3>
 	<p>Author: {{post.user.username}}</p>
     <p>Created at: {{post.created_at}}</p>
-	{{!post.get_abstract()}}<a href="{{!post.detail_path()}}">...read more.</a>
+	{{!post.get_abstract()}}<a href="{{!post.path()}}">...read more.</a>
     <p>------------------------------------------------</p>
 % end

@@ -16,7 +16,7 @@
 				<td>{{user.first_name}}</td>
 				<td>{{user.last_name}}</td>
 				<td><a href="{{!user.path()}}">{{user.username}}'s Profile</a></td>
-				<td><a href="{{!user.post_path()}}">{{user.username}}'s Posts</a></td>
+				<td><a href="{{!user.posts_path()}}">{{user.username}}'s Posts</a></td>
 			</tr>
 		% end
 	</table>
