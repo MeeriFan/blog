@@ -30,6 +30,7 @@
 					<li><a id="logout" href="/logout">Logout</a></li>
 				% end
 				<li><a href="/users">Users</a></li>
+				<li><a href="/search">Search</a></li>
 			</ul>
 		</nav>
 		{{!base}}
