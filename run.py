@@ -274,10 +274,9 @@ def all_posts(user_id, post_id):
 @app.route('/search')
 def search_post():
     searchword = request.query.q
-    matched_posts = Post.matching_posts(searchword)
     info = {
         'current_user': logged_in(),
-        'posts': matched_posts
+        'posts': Post.matching_posts(searchword)
     }
     return template('search.tpl', info)
 
