@@ -2,7 +2,7 @@
 % if not current_user:
 % include('login_error.tpl')
 % else:
-<form action="/users/{{current_user.id}}/newpost" method="post">
+<form action="{{!current_user.path()}}/newpost" method="post">
     <fieldset>
         <legend>New Post</legend>
         <label for="title">Title of your post: </label>

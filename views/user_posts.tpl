@@ -3,4 +3,4 @@
 % include('posts.tpl')
 <br>
 <br>
-<a href="/users">Back</a>
+<a href="{{!User.index_path()}}">Back</a>

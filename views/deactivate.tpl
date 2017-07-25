@@ -3,5 +3,5 @@
 <form method="post" action="/deactivate">
 	<p>{{message}}</p>
 	<input type="submit" name="deactivate" value="Yes">
-	<a href="/profile">No</a>
+	<a href="{{!current_user.path()}}">No</a>
 </form>
