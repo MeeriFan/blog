@@ -2,13 +2,13 @@
 <h2>{{title}}</h2>
 <br>
 % if current_user == user:
-    <a href="/users/{{current_user.id}}/delete">Delete my profile</a>
+    <a href="{{!current_user.path()}}/delete">Delete my profile</a>
     <br>
-    <a href="/users/{{current_user.id}}/editprofile">Edit my Profiletext</a>
+    <a href="{{!current_user.path()}}/editprofile">Edit my Profiletext</a>
     <br>
     <h5>What I say about myself:</h5>
     % if current_user.profile_text == '':
-        <p>Describe <a href="/users/{{current_user.id}}/editprofile">yourself</a>.</p>
+        <p>Describe <a href="{{!current_user.path()}}/editprofile">yourself</a>.</p>
     % else:
         <p>{{current_user.profile_text}}</p>
     % end
@@ -26,6 +26,6 @@
 % include('posts.tpl')
 <br>
 <br>
-<a href="/users">Back</a>
+<a href="{{!User.index_path()}}">Back</a>
 
 

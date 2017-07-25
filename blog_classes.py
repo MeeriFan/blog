@@ -94,6 +94,15 @@ class User(BaseModel):
         self.profile_text = profile_text
         self.save()
 
+    def path(self):
+        return '/users/' + str(self.id)
+
+    def post_path(self):
+        return '/users/' + str(self.id) + '/posts'
+
+    def index_path():
+        return '/users'
+
 
 class Post(BaseModel):
     user = ForeignKeyField(User, related_name='posts')
@@ -123,3 +132,6 @@ class Post(BaseModel):
         return Post.select().where(
             Post.body.contains(searchword) | Post.title.contains(searchword)
         )
+
+    def detail_path(self):
+        return '/users/' + str(self.user.id) + '/posts/' + str(self.id)

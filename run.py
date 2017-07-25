@@ -69,7 +69,7 @@ def edit_profile(user_id):
 def save_profile_description(user_id):
     current_user = logged_in()
     current_user.save_profile_text(request.forms.profile_text)
-    return redirect('/users/'+str(current_user.id))
+    return redirect(current_user.path())
 
 
 @app.route('/users')
@@ -137,7 +137,7 @@ def do_login():
     if user.verify_login():
         user = User.by_email(user.email)
         set_app_cookie(user.id)
-        return redirect('/users/'+str(user.id))
+        return redirect(user.path())
     else:
         return redirect('/login/failed')
 
@@ -145,7 +145,7 @@ def do_login():
 @app.post('/logout')
 def do_logout():
     delete_app_cookie()
-    return redirect('/index')
+    return redirect('/')
 
 
 @app.route('/registration')
@@ -259,7 +259,7 @@ def save_post(user_id):
         created_at=datetime.now()
     )
     new_post.save()
-    return redirect('/users/'+str(current_user.id))
+    return redirect(current_user.path())
 
 
 @app.route('/users/<user_id:int>/posts')
