@@ -1,7 +1,7 @@
 from bottle import template, Bottle, debug, run, request, response
 from bottle import redirect, static_file
 from uuid import uuid4
-from blog_classes import User, Post
+from blog_classes import User, Post, Comment
 from datetime import datetime
 
 app = Bottle()
@@ -280,6 +280,18 @@ def one_post(user_id, post_id):
         'post': Post.get_post(post_id)
     }
     return template('single_post.tpl', info)
+
+
+@app.post('/users/<user_id:int>/posts/<post_id:int>')
+def save_comment(user_id, post_id):
+    new_comment = Comment(
+        body=request.forms.body,
+        created_at=datetime.now(),
+        user=logged_in(),
+        post=Post.get_post(post_id)
+    )
+    new_comment.save()
+    return redirect('/users/%d/posts/%d' % (user_id, post_id))
 
 
 @app.route('/search')

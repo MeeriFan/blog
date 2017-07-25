@@ -135,3 +135,19 @@ class Post(BaseModel):
 
     def path(self):
         return '/users/%d/posts/%d' % (self.user.id, self.id)
+
+
+class Comment(BaseModel):
+    body = TextField(default='')
+    user = ForeignKeyField(User, related_name='comments')
+    post = ForeignKeyField(Post, related_name='comments')
+    created_at = DateTimeField()
+
+    class Meta:
+        db_table = 'comments'
+
+    def render_body(self):
+        return markdown(self.body, output_format='html5')
+
+    def nice_date(self):
+        return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
