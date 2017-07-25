@@ -263,14 +263,14 @@ def save_post(user_id):
 
 
 @app.route('/users/<user_id:int>/posts')
-def all_user_posts(user_id):
+def user_posts(user_id):
     user = User.get_user(user_id)
     info = {
         'current_user': logged_in(),
         'user': user,
         'posts': user.posts.order_by(Post.created_at.desc())
     }
-    return template('all_posts.tpl', info)
+    return template('user_posts.tpl', info)
 
 
 @app.route('/users/<user_id:int>/posts/<post_id:int>')
