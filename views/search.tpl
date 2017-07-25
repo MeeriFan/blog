@@ -4,7 +4,7 @@
     </fieldset>
 </form>
 <a href="/index">Back to mainpage</a>
-% if not word == '':
+% if search_term:
 	% if len(posts) == 0:
 		<p>We couldn't find any post containing your searchword. Please try again with a different word.</p>
 	% else:

@@ -277,7 +277,7 @@ def search_post():
     info = {
         'current_user': logged_in(),
         'posts': Post.matching_posts(searchword),
-        'word': searchword
+        'search_term': searchword
     }
     return template('search.tpl', info)
 

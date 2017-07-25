@@ -31,7 +31,7 @@
 				% end
 				<li><a href="/users">Users</a></li>
 			</ul>
-			% include('search.tpl', word='')
+			% include('search.tpl', search_term='')
 		</nav>
 		{{!base}}
 	</body>
