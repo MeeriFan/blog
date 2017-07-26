@@ -13,6 +13,12 @@ class BaseModel(Model):
     class Meta:
         database = db
 
+    def nice_date(self):
+        return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
+
+    def render_body(self):
+        return markdown(self.body, output_format='html5')
+
 
 class User(BaseModel):
     username = CharField(default='')
@@ -113,9 +119,6 @@ class Post(BaseModel):
     class Meta:
         db_table = 'posts'
 
-    def render_body(self):
-        return markdown(self.body, output_format='html5')
-
     def get_abstract(self):
         return markdown(self.body[:50], output_format='html5')
 
@@ -124,9 +127,6 @@ class Post(BaseModel):
             return Post.get(Post.id == post_id)
         except:
             return None
-
-    def nice_date(self):
-        return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
 
     def matching_posts(searchword):
         return Post.select().where(
@@ -145,9 +145,3 @@ class Comment(BaseModel):
 
     class Meta:
         db_table = 'comments'
-
-    def render_body(self):
-        return markdown(self.body, output_format='html5')
-
-    def nice_date(self):
-        return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
