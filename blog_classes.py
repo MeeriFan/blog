@@ -9,15 +9,19 @@ import datetime
 db = SqliteDatabase('blog.db')
 
 
-class BaseModel(Model):
-    class Meta:
-        database = db
+class NiceFormatter(object):
+    FORMAT_DATE = "%a, %d. %b %Y, %H:%M:%S"
 
     def nice_date(self):
-        return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
+        return self.created_at.strftime(self.FORMAT_DATE)
 
     def render_body(self):
         return markdown(self.body, output_format='html5')
+
+
+class BaseModel(Model):
+    class Meta:
+        database = db
 
 
 class User(BaseModel):
@@ -110,7 +114,7 @@ class User(BaseModel):
         return '/users'
 
 
-class Post(BaseModel):
+class Post(BaseModel, NiceFormatter):
     user = ForeignKeyField(User, related_name='posts')
     title = CharField(default='')
     body = TextField(default='')
@@ -137,7 +141,7 @@ class Post(BaseModel):
         return '/users/%d/posts/%d' % (self.user.id, self.id)
 
 
-class Comment(BaseModel):
+class Comment(BaseModel, NiceFormatter):
     body = TextField(default='')
     user = ForeignKeyField(User, related_name='comments')
     post = ForeignKeyField(Post, related_name='comments')
