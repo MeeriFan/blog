@@ -282,7 +282,7 @@ def one_post(user_id, post_id):
     return template('single_post.tpl', info)
 
 
-@app.post('/users/<user_id:int>/posts/<post_id:int>')
+@app.post('/users/<user_id:int>/posts/<post_id:int>/comments')
 def save_comment(user_id, post_id):
     new_comment = Comment(
         body=request.forms.body,

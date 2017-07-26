@@ -1,4 +1,4 @@
-<form action="{{!post.path()}}" method="post">
+<form action="{{!post.path()}}/comments" method="post">
 	<fieldset>
 		<legend>Leave a Comment</legend>
 		<br>
