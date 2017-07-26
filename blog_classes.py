@@ -14,6 +14,16 @@ class BaseModel(Model):
         database = db
 
 
+class Postable(BaseModel):
+    FORMAT_DATE = "%a, %d. %b %Y, %H:%M:%S"
+
+    def nice_date(self):
+        return self.created_at.strftime(self.FORMAT_DATE)
+
+    def render_body(self):
+        return markdown(self.body, output_format='html5')
+
+
 class User(BaseModel):
     username = CharField(default='')
     email = CharField(default='')
@@ -104,7 +114,7 @@ class User(BaseModel):
         return '/users'
 
 
-class Post(BaseModel):
+class Post(Postable):
     user = ForeignKeyField(User, related_name='posts')
     title = CharField(default='')
     body = TextField(default='')
@@ -112,9 +122,6 @@ class Post(BaseModel):
 
     class Meta:
         db_table = 'posts'
-
-    def render_body(self):
-        return markdown(self.body, output_format='html5')
 
     def get_abstract(self):
         return markdown(self.body[:50], output_format='html5')
@@ -125,9 +132,6 @@ class Post(BaseModel):
         except:
             return None
 
-    def nice_date(self):
-        return self.created_at.strftime("%a, %d. %b %Y, %H:%M:%S")
-
     def matching_posts(searchword):
         return Post.select().where(
             Post.body.contains(searchword) | Post.title.contains(searchword)
@@ -135,3 +139,13 @@ class Post(BaseModel):
 
     def path(self):
         return '/users/%d/posts/%d' % (self.user.id, self.id)
+
+
+class Comment(Postable):
+    body = TextField(default='')
+    user = ForeignKeyField(User, related_name='comments')
+    post = ForeignKeyField(Post, related_name='comments')
+    created_at = DateTimeField()
+
+    class Meta:
+        db_table = 'comments'
