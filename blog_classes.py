@@ -76,7 +76,7 @@ class User(BaseModel):
         if self.email != '':
             db_user = User.by_email(self.email)
         elif self.username != '':
-            db_user = User.slug(self.username)
+            db_user = User.by_username(self.username)
         if not db_user:
             return False
         self.salt = db_user.salt
@@ -105,11 +105,11 @@ class User(BaseModel):
             return None
 
     def delete_user(username):
-        user = User.slug(username)
+        user = User.by_username(username)
         user.delete_instance()
 
     def deactivate_user(username):
-        user = User.slug(username)
+        user = User.by_username(username)
         user.active = False
         user.save()
 
@@ -121,13 +121,16 @@ class User(BaseModel):
         self.save()
 
     def path(self):
-        return '/users/%s' % self.user_slug()
+        return '/users/%s' % self.slug()
 
     def posts_path(self):
-        return '/users/%s/posts' % self.user_slug()
+        return '/users/%s/posts' % self.slug()
 
     def index_path():
         return '/users'
+
+    def slug(self):
+        return self.username
 
 
 class Post(Postable):
@@ -154,7 +157,7 @@ class Post(Postable):
         )
 
     def path(self):
-        return '/users/%s/posts/%d' % (self.user.user_slug(), self.id)
+        return '/users/%s/posts/%d' % (self.user.slug(), self.id)
 
 
 class Comment(Postable):
