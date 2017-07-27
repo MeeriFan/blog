@@ -28,7 +28,7 @@ def get_key():
 def logged_in():
     session_key = get_key()
     if session_key:
-        return User.get_by_id(session_dict[session_key])
+        return User.by_id(session_dict[session_key])
     return None
 
 
@@ -85,7 +85,7 @@ def list_users():
 
 @app.route('/users/<username>')
 def specific_user(username):
-    user = User.slug(username)
+    user = User.by_username(username)
     current_user = logged_in()
     if current_user and current_user.id == user.id:
         message = 'Hello ' + current_user.first_name + ' ' \
@@ -130,8 +130,7 @@ def login_form_failed():
 @app.post('/login')
 @app.post('/login/failed')
 def do_login():
-    # TO DO allow username or email for registration
-    user_input = request.forms.get('verification')
+    user_input = request.forms.get('username_or_email')
     user = User(password=request.forms.get('pw'))
     if '@' in user_input:
         user.email = user_input
@@ -141,7 +140,7 @@ def do_login():
         if user.email != '':
             user = User.by_email(user.email)
         elif user.username != '':
-            user = User.slug(user.username)
+            user = User.by_username(user.username)
         set_app_cookie(user.id)
         return redirect(user.path())
     else:
@@ -270,7 +269,7 @@ def save_post(username):
 
 @app.route('/users/<username>/posts')
 def user_posts(username):
-    user = User.slug(username)
+    user = User.by_username(username)
     info = {
         'current_user': logged_in(),
         'user': user,

@@ -92,13 +92,13 @@ class User(BaseModel):
         except:
             return None
 
-    def get_by_id(user_id):
+    def by_id(user_id):
         try:
             return User.get(User.id == user_id)
         except:
             return None
 
-    def slug(username):
+    def by_username(username):
         try:
             return User.get(User.username == username)
         except:
@@ -119,9 +119,6 @@ class User(BaseModel):
     def save_profile_text(self, profile_text):
         self.profile_text = profile_text
         self.save()
-
-    def user_slug(self):
-        return self.username
 
     def path(self):
         return '/users/%s' % self.user_slug()
