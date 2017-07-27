@@ -28,7 +28,7 @@ def get_key():
 def logged_in():
     session_key = get_key()
     if session_key:
-        return User.get_user(session_dict[session_key])
+        return User.get_by_id(session_dict[session_key])
     return None
 
 
@@ -47,8 +47,8 @@ session_dict = {}
 SECRET = 'dogcatmouse'
 
 
-@app.route('/users/<user_id:int>/editprofile')
-def edit_profile(user_id):
+@app.route('/users/<username>/editprofile')
+def edit_profile(username):
     current_user = logged_in()
     if not current_user:
         info = {
@@ -65,8 +65,8 @@ def edit_profile(user_id):
         return template('edit_profile.tpl', info)
 
 
-@app.post('/users/<user_id:int>/editprofile')
-def save_profile_description(user_id):
+@app.post('/users/<username>/editprofile')
+def save_profile_description(username):
     current_user = logged_in()
     current_user.save_profile_text(request.forms.profile_text)
     return redirect(current_user.path())
@@ -83,9 +83,9 @@ def list_users():
     return template('users.tpl', info)
 
 
-@app.route('/users/<user_id:int>')
-def specific_user(user_id):
-    user = User.get_user(user_id)
+@app.route('/users/<username>')
+def specific_user(username):
+    user = User.slug(username)
     current_user = logged_in()
     if current_user and current_user.id == user.id:
         message = 'Hello ' + current_user.first_name + ' ' \
@@ -130,12 +130,18 @@ def login_form_failed():
 @app.post('/login')
 @app.post('/login/failed')
 def do_login():
-    user = User(
-        email=request.forms.get('email'),
-        password=request.forms.get('pw')
-    )
+    # TO DO allow username or email for registration
+    user_input = request.forms.get('verification')
+    user = User(password=request.forms.get('pw'))
+    if '@' in user_input:
+        user.email = user_input
+    else:
+        user.username = user_input
     if user.verify_login():
-        user = User.by_email(user.email)
+        if user.email != '':
+            user = User.by_email(user.email)
+        elif user.username != '':
+            user = User.slug(user.username)
         set_app_cookie(user.id)
         return redirect(user.path())
     else:
@@ -220,8 +226,8 @@ def do_deactivate():
     return template('sorry.tpl', info)
 
 
-@app.route('/users/<user_id:int>/delete')
-def delete_account(user_id):
+@app.route('/users/<username>/delete')
+def delete_account(username):
     info = {
         'title': 'Good Bye?',
         'message': 'You really want to delete your account? This means that your \
@@ -232,9 +238,9 @@ def delete_account(user_id):
     return template('delete.tpl', info)
 
 
-@app.post('/users/<user_id:int>/delete')
-def do_delete(user_id):
-    User.delete_user(user_id)
+@app.post('/users/<username>/delete')
+def do_delete(username):
+    User.delete_user(username)
     delete_app_cookie()
     info = {
         'current_user': logged_in(),
@@ -243,14 +249,14 @@ def do_delete(user_id):
     return template('sorry.tpl', info)
 
 
-@app.route('/users/<user_id:int>/newpost')
-def new_post(user_id):
+@app.route('/users/<username>/newpost')
+def new_post(username):
     current_user = logged_in()
     return template('new_post.tpl', current_user=current_user)
 
 
-@app.post('/users/<user_id:int>/newpost')
-def save_post(user_id):
+@app.post('/users/<username>/newpost')
+def save_post(username):
     current_user = logged_in()
     new_post = Post(
         title=request.forms.title,
@@ -262,9 +268,9 @@ def save_post(user_id):
     return redirect(current_user.path())
 
 
-@app.route('/users/<user_id:int>/posts')
-def user_posts(user_id):
-    user = User.get_user(user_id)
+@app.route('/users/<username>/posts')
+def user_posts(username):
+    user = User.slug(username)
     info = {
         'current_user': logged_in(),
         'user': user,
@@ -273,8 +279,9 @@ def user_posts(user_id):
     return template('user_posts.tpl', info)
 
 
-@app.route('/users/<user_id:int>/posts/<post_id:int>')
-def one_post(user_id, post_id):
+@app.route('/users/<username>/posts/<post_id:int>')
+def one_post(username, post_id):
+    # Using title instead of post id?
     info = {
         'current_user': logged_in(),
         'post': Post.get_post(post_id)
@@ -282,8 +289,8 @@ def one_post(user_id, post_id):
     return template('single_post.tpl', info)
 
 
-@app.post('/users/<user_id:int>/posts/<post_id:int>/comments')
-def save_comment(user_id, post_id):
+@app.post('/users/<username>/posts/<post_id:int>/comments')
+def save_comment(username, post_id):
     new_comment = Comment(
         body=request.forms.body,
         created_at=datetime.now(),
@@ -291,7 +298,7 @@ def save_comment(user_id, post_id):
         post=Post.get_post(post_id)
     )
     new_comment.save()
-    return redirect('/users/%d/posts/%d' % (user_id, post_id))
+    return redirect('/users/%s/posts/%d' % (username, post_id))
 
 
 @app.route('/search')

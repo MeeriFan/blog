@@ -4,7 +4,7 @@
     <fieldset>
         <p>{{message}}</p>
         <ul>
-            <li>Email: <input type="email" name="email"></li>
+            <li>Email or Username: <input type="text" name="verification"></li>
             <li>Password: <input type="password" name="pw"></li>
         </ul>
         <input type="submit" name="Submit form">

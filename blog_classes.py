@@ -5,6 +5,7 @@ from peewee import CharField, TextField, ForeignKeyField
 from peewee import DateTimeField
 from markdown import markdown
 import datetime
+import re
 
 db = SqliteDatabase('blog.db')
 
@@ -51,6 +52,12 @@ class User(BaseModel):
                                         have to be the same.'
         if '@' not in self.email:
             return False, 'Your email address is not valid.'
+        if User.select().where(User.username == self.username):
+            return False, 'This username is already taken. Please \
+                                            use a different one.'
+        if not re.match("^[A-Za-z0-9_-.~]*$", self.username):
+            return False, 'For your username please use only: \
+                                        a-z, A-Z, 0-9, ., ~, _ or -.'
         return True, None
 
     def is_already_in_db(self):
@@ -66,13 +73,16 @@ class User(BaseModel):
             ).hexdigest()
 
     def verify_login(self):
-        db_user = User.by_email(self.email)
+        if self.email != '':
+            db_user = User.by_email(self.email)
+        elif self.username != '':
+            db_user = User.slug(self.username)
         if not db_user:
             return False
         self.salt = db_user.salt
         self.password = self.hash_password()
         return User.select().where(
-            User.email == self.email,
+            (User.email == self.email) | (User.username == self.username),
             User.password == self.password
         ).exists()
 
@@ -82,18 +92,24 @@ class User(BaseModel):
         except:
             return None
 
-    def get_user(user_id):
+    def get_by_id(user_id):
         try:
             return User.get(User.id == user_id)
         except:
             return None
 
-    def delete_user(user_id):
-        user = User.get_user(user_id)
+    def slug(username):
+        try:
+            return User.get(User.username == username)
+        except:
+            return None
+
+    def delete_user(username):
+        user = User.slug(username)
         user.delete_instance()
 
-    def deactivate_user(user_id):
-        user = User.get_user(user_id)
+    def deactivate_user(username):
+        user = User.slug(username)
         user.active = False
         user.save()
 
@@ -104,11 +120,14 @@ class User(BaseModel):
         self.profile_text = profile_text
         self.save()
 
+    def user_slug(self):
+        return self.username
+
     def path(self):
-        return '/users/%d' % self.id
+        return '/users/%s' % self.user_slug()
 
     def posts_path(self):
-        return '/users/%d/posts' % self.id
+        return '/users/%s/posts' % self.user_slug()
 
     def index_path():
         return '/users'
@@ -138,7 +157,7 @@ class Post(Postable):
         )
 
     def path(self):
-        return '/users/%d/posts/%d' % (self.user.id, self.id)
+        return '/users/%s/posts/%d' % (self.user.user_slug(), self.id)
 
 
 class Comment(Postable):
